@@ -1,0 +1,16 @@
+.counter {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  user-select: none;
+}
+
+.current {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.muted {
+  color: var(--text-muted);
+}

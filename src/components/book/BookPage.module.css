@@ -1,0 +1,131 @@
+/* ── Base page ──────────────────────────────────────────────────────────────── */
+.page {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background: var(--page-bg);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.left {
+  border-radius: 8px 0 0 8px;
+  border-right: 1px solid var(--spine-color);
+}
+
+.right {
+  border-radius: 0 8px 8px 0;
+}
+
+/* ── Flip animations ────────────────────────────────────────────────────────── */
+.flipForwardRight {
+  animation: flipForwardRight 600ms cubic-bezier(0.4, 0.0, 0.2, 1.0) forwards;
+  transform-origin: left center;
+}
+
+.flipBackwardLeft {
+  animation: flipBackwardLeft 600ms cubic-bezier(0.4, 0.0, 0.2, 1.0) forwards;
+  transform-origin: right center;
+}
+
+/*
+ * Two-phase forward flip with edge-on linger (right page, spine pivot at left):
+ *
+ *   0%  →  40%:  0deg  → -85deg   fast approach, decelerating into edge-on
+ *   40% →  50%:  -85deg → -90deg  near-crawl — the linger; only 5° in 10% of time
+ *   50% →  60%:  -90deg → -95deg  slow departure from edge-on, just past seam
+ *   60% → 100%:  -95deg → -180deg re-acceleration to flat on the other side
+ *
+ * The tight 10-degree window (40%–60%) means the animation dwells at 90°
+ * long enough for the eye to register the thin vertical sliver before the
+ * page opens on the other side. Shadow peaks at -90° and falls away quickly.
+ */
+@keyframes flipForwardRight {
+  0% {
+    transform: rotateY(0deg);
+    box-shadow: none;
+  }
+  40% {
+    transform: rotateY(-85deg);
+    box-shadow: -18px 0 50px 8px var(--flip-shadow);
+  }
+  50% {
+    transform: rotateY(-90deg);
+    box-shadow: -20px 0 60px 10px var(--flip-shadow);
+  }
+  60% {
+    transform: rotateY(-95deg);
+    box-shadow: -14px 0 40px 6px var(--flip-shadow);
+  }
+  100% {
+    transform: rotateY(-180deg);
+    box-shadow: none;
+  }
+}
+
+/*
+ * Two-phase backward flip with edge-on linger (left page, spine pivot at right):
+ *   Mirror of flipForwardRight — positive Y rotation, rightward shadow.
+ *
+ *   0%  →  40%:  0deg  →  85deg
+ *   40% →  50%:  85deg →  90deg  linger at edge-on
+ *   50% →  60%:  90deg →  95deg  slow departure past seam
+ *   60% → 100%:  95deg → 180deg  re-acceleration to flat
+ */
+@keyframes flipBackwardLeft {
+  0% {
+    transform: rotateY(0deg);
+    box-shadow: none;
+  }
+  40% {
+    transform: rotateY(85deg);
+    box-shadow: 18px 0 50px 8px var(--flip-shadow);
+  }
+  50% {
+    transform: rotateY(90deg);
+    box-shadow: 20px 0 60px 10px var(--flip-shadow);
+  }
+  60% {
+    transform: rotateY(95deg);
+    box-shadow: 14px 0 40px 6px var(--flip-shadow);
+  }
+  100% {
+    transform: rotateY(180deg);
+    box-shadow: none;
+  }
+}
+
+/* ── Inner content wrapper ──────────────────────────────────────────────────── */
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Spine shadow overlays ──────────────────────────────────────────────────── */
+/* A 40px strip along the inner edge to simulate depth near the spine */
+.spineShadow {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.spineShadowLeft {
+  right: 0;
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.07));
+}
+
+.spineShadowRight {
+  left: 0;
+  background: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.07));
+}

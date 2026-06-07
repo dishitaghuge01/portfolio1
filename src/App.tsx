@@ -1,36 +1,30 @@
-import { useState } from "react";
-import type { Theme } from "./types";
+import React, { useEffect, useState } from 'react';
+import { BookProvider } from './contexts/BookContext';
+import { spreadsMeta } from './data/spreads';
+import Book from './components/book/Book';
+import ThemeToggle from './components/book/ThemeToggle';
+import type { Theme } from './types/index';
 
-export default function App() {
-  const [theme, setTheme] = useState<Theme>("dark");
+const App: React.FC = () => {
+  const [theme, setTheme] = useState<Theme>('dark');
 
-  const toggleTheme = () => {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.setAttribute("data-theme", next);
-  };
+  // Sync theme to document root so CSS token selectors fire
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
 
   return (
-    <div style={{ 
-      width: "100vw", 
-      height: "100vh", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center",
-      background: "var(--bg-base)",
-      color: "var(--text-primary)"
-    }}>
-      <div>
-        <p style={{ fontFamily: "monospace", opacity: 0.5, fontSize: 13 }}>
-          portfolio-book scaffold ready
-        </p>
-        <button 
-          onClick={toggleTheme}
-          style={{ marginTop: 16, padding: "8px 16px", cursor: "pointer" }}
-        >
-          Toggle theme → {theme}
-        </button>
-      </div>
-    </div>
+    <>
+      <BookProvider totalSpreads={spreadsMeta.length}>
+        <Book />
+      </BookProvider>
+
+      <ThemeToggle theme={theme} onToggle={toggleTheme} />
+    </>
   );
-}
+};
+
+export default App;
