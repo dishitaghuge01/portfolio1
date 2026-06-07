@@ -1,0 +1,83 @@
+/* ─── DARK THEME (default) ─── */
+[data-theme="dark"], :root {
+  --bg-base: #0a0d14;
+  --bg-surface: #0f1520;
+
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-hover: rgba(255, 255, 255, 0.20);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-blur: blur(16px);
+
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.30);
+
+  --accent-primary: #7eb8f7;   /* cool blue */
+  --accent-secondary: #a78bfa; /* soft violet */
+  --accent-glow: rgba(126, 184, 247, 0.15);
+
+  --cluster-ml: #7eb8f7;
+  --cluster-cv: #a78bfa;
+  --cluster-backend: #34d399;
+  --cluster-data: #f59e0b;
+  --cluster-research: #f87171;
+
+  --page-bg: linear-gradient(135deg, #0f1a2e 0%, #0a0d14 50%, #130f1e 100%);
+  --spine-color: rgba(126, 184, 247, 0.2);
+
+  --flip-shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* ─── LIGHT THEME ─── */
+[data-theme="light"] {
+  --bg-base: #f0ece4;
+  --bg-surface: #e8e2d8;
+
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-hover: rgba(255, 255, 255, 0.60);
+  --glass-border: rgba(255, 255, 255, 0.70);
+  --glass-border-hover: rgba(255, 255, 255, 0.90);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --glass-blur: blur(16px);
+
+  --text-primary: rgba(20, 20, 30, 0.90);
+  --text-secondary: rgba(20, 20, 30, 0.55);
+  --text-muted: rgba(20, 20, 30, 0.35);
+
+  --accent-primary: #2563eb;
+  --accent-secondary: #7c3aed;
+  --accent-glow: rgba(37, 99, 235, 0.12);
+
+  --cluster-ml: #2563eb;
+  --cluster-cv: #7c3aed;
+  --cluster-backend: #059669;
+  --cluster-data: #d97706;
+  --cluster-research: #dc2626;
+
+  --page-bg: linear-gradient(135deg, #f5f0e8 0%, #ede8de 50%, #ede8f0 100%);
+  --spine-color: rgba(37, 99, 235, 0.15);
+
+  --flip-shadow: rgba(0, 0, 0, 0.15);
+}
+
+/* ─── GLOBAL RESET ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Instrument Serif', Georgia, serif;
+  transition: background 0.4s ease, color 0.4s ease;
+}

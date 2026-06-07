@@ -1,0 +1,59 @@
+.glass-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  padding: 2rem;
+  width: min(100%, 48rem);
+  margin: 0 auto;
+}
+
+.glass-button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  color: inherit;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 0.9rem 1.3rem;
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.glass-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.book-shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.book-header,
+.book-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.spread {
+  display: grid;
+  gap: 1rem;
+}
+
+.spread h2 {
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+.spread-copy p {
+  line-height: 1.8;
+  margin: 0;
+  color: var(--text-muted);
+}
