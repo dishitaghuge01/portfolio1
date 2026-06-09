@@ -1,0 +1,82 @@
+/* ── Page layout ─────────────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+}
+
+/* ── Starfield card wrapper ──────────────────────────────────────────────────── */
+.starfieldCard {
+  flex: 1;
+  min-height: 0; /* allow flex child to shrink below content size */
+}
+
+/* ── SVG fills the card ──────────────────────────────────────────────────────── */
+.svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Node glow circle (behind main circle) ───────────────────────────────────── */
+.nodeGlow {
+  pointer-events: none;
+}
+
+/* ── Node circle — transitions for hover scale ───────────────────────────────── */
+.nodeCircle {
+  transition: transform 0.2s ease, r 0.2s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  cursor: pointer;
+}
+
+.nodeCircleHovered {
+  transform: scale(1.5);
+}
+
+/* ── Node group — floating animation applied via inline style ─────────────────── */
+/* Animation declaration; duration + delay set inline per node */
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-2px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ── Hover label text ────────────────────────────────────────────────────────── */
+.nodeLabel {
+  pointer-events: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Search bar ──────────────────────────────────────────────────────────────── */
+.searchBar {
+  flex-shrink: 0;
+  width: 100%;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  padding: 0 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.searchBar::placeholder {
+  color: var(--text-muted);
+}
+
+.searchBar:focus {
+  border-color: color-mix(in srgb, var(--accent-primary) 60%, transparent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}

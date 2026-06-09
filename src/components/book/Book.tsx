@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useBook } from '../../contexts/BookContext';
 import { spreadsMeta } from '../../data/spreads';
 import BookPage from './BookPage';
 import BookSpine from './BookSpine';
 import SpreadCounter from './SpreadCounter';
+import Spread1Left from '../spreads/Spread1Left';
+import Spread1Right from '../spreads/Spread1Right';
 import styles from './Book.module.css';
 
 const Book: React.FC = () => {
@@ -15,6 +17,18 @@ const Book: React.FC = () => {
     isFlipping,
     flipDirection,
   } = useBook();
+
+  // Track how many times spread 1 has been entered — passed as animationKey
+  // so Spread1Left re-runs its intro animation on each return visit.
+  const spread1VisitCount = useRef(0);
+  const prevSpreadRef     = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (currentSpread === 1 && prevSpreadRef.current !== 1) {
+      spread1VisitCount.current += 1;
+    }
+    prevSpreadRef.current = currentSpread;
+  }, [currentSpread]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -42,12 +56,16 @@ const Book: React.FC = () => {
             isFlipping={isFlipping}
             flipDirection={flipDirection}
           >
-            <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>{spreadIcon}</span>
-              <span className={styles.placeholderLabel}>
-                Spread {currentSpread} · Left
-              </span>
-            </div>
+            {currentSpread === 1 ? (
+              <Spread1Left animationKey={spread1VisitCount.current} />
+            ) : (
+              <div className={styles.placeholder}>
+                <span className={styles.placeholderIcon}>{spreadIcon}</span>
+                <span className={styles.placeholderLabel}>
+                  Spread {currentSpread} · Left
+                </span>
+              </div>
+            )}
           </BookPage>
 
           {/* Right page */}
@@ -56,12 +74,16 @@ const Book: React.FC = () => {
             isFlipping={isFlipping}
             flipDirection={flipDirection}
           >
-            <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>{spreadIcon}</span>
-              <span className={styles.placeholderLabel}>
-                Spread {currentSpread} · Right
-              </span>
-            </div>
+            {currentSpread === 1 ? (
+              <Spread1Right />
+            ) : (
+              <div className={styles.placeholder}>
+                <span className={styles.placeholderIcon}>{spreadIcon}</span>
+                <span className={styles.placeholderLabel}>
+                  Spread {currentSpread} · Right
+                </span>
+              </div>
+            )}
           </BookPage>
 
           {/* Decorative spine divider */}
