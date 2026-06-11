@@ -1,0 +1,165 @@
+/* ── Full-height page ────────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Top half — media zone ───────────────────────────────────────────────────── */
+.mediaZone {
+  flex: 0 0 52%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Blueprint grid overlay */
+.mediaZone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.04) 0px,
+      rgba(255,255,255,0.04) 1px,
+      transparent 1px,
+      transparent 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.04) 0px,
+      rgba(255,255,255,0.04) 1px,
+      transparent 1px,
+      transparent 32px
+    );
+}
+
+/* Centered icon + watermark stack */
+.mediaContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mediaIcon {
+  font-size: 48px;
+  opacity: 0.4;
+  line-height: 1;
+}
+
+.mediaWatermark {
+  font-family: 'Instrument Serif', serif;
+  font-size: 64px;
+  font-weight: 400;
+  color: var(--text-primary);
+  opacity: 0.08;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 90%;
+  text-overflow: clip;
+}
+
+/* Corner pill buttons */
+.cornerPill {
+  position: absolute;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.30);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 999px;
+  padding: 6px 14px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.cornerPill:hover {
+  background: rgba(0, 0, 0, 0.50);
+}
+
+.pillTopRight {
+  top: 16px;
+  right: 16px;
+}
+
+.pillTopLeft {
+  top: 16px;
+  left: 16px;
+}
+
+/* ── Bottom half — detail zone ───────────────────────────────────────────────── */
+.detailZone {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--page-bg);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Row 1 — number badge + title */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.numberBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.projectTitle {
+  font-family: 'Instrument Serif', serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Row 2 — description */
+.description {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Row 3 — chips */
+.chipRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}

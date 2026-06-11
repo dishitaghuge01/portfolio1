@@ -3,17 +3,6 @@ import { spreadsMeta } from '../../data/spreads';
 import { useBook } from '../../contexts/BookContext';
 import styles from './Spread2.module.css';
 
-// ── Per-spread subtitles (spreads 3–9, indexed by spread number) ──────────────
-const SUBTITLES: Record<number, string> = {
-  3: 'Computer Vision · PyTorch · CUDA',
-  4: 'Transformers · HuggingFace · FastAPI',
-  5: 'Go · Kubernetes · S3 API',
-  6: 'Knowledge Graphs · Neo4j · LLMs',
-  7: 'Papers & Publications',
-  8: 'Skills · Education · Achievements',
-  9: 'Contact & Closing',
-};
-
 // ── Left page ─────────────────────────────────────────────────────────────────
 export const Spread2Left: React.FC = () => (
   <div className={styles.leftPage}>
@@ -69,7 +58,7 @@ export const Spread2Right: React.FC = () => {
           <div className={styles.entryText}>
             <span className={styles.entryTitle}>{entry.title}</span>
             <span className={styles.entrySubtitle}>
-              {SUBTITLES[entry.index] ?? ''}
+              {spreadsMeta.find((s) => s.index === entry.index)?.subtitle ?? ''}
             </span>
           </div>
 

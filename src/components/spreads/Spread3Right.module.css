@@ -1,0 +1,111 @@
+/* ── Page layout ─────────────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 20px;
+}
+
+/* ── Spread label ────────────────────────────────────────────────────────────── */
+.spreadLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ── Project title ───────────────────────────────────────────────────────────── */
+.title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 48px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1;
+  margin: 0;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────────── */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--glass-border);
+  border: none;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* ── Description card content ────────────────────────────────────────────────── */
+.descBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.descText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Tech stack ──────────────────────────────────────────────────────────────── */
+.techBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.techLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.chipRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Stats row ───────────────────────────────────────────────────────────────── */
+.statsRow {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.statNumber {
+  font-family: 'Instrument Serif', serif;
+  font-size: 24px;
+  color: var(--accent-primary);
+  line-height: 1;
+  margin: 0;
+}
+
+.statLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  margin: 0;
+  text-align: center;
+}

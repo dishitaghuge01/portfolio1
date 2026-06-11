@@ -7,6 +7,7 @@ import SpreadCounter from './SpreadCounter';
 import Spread1Left from '../spreads/Spread1Left';
 import Spread1Right from '../spreads/Spread1Right';
 import { Spread2Left, Spread2Right } from '../spreads/Spread2';
+import ProjectPage from '../spreads/ProjectPage';
 import styles from './Book.module.css';
 
 const Book: React.FC = () => {
@@ -61,6 +62,10 @@ const Book: React.FC = () => {
               <Spread1Left animationKey={spread1VisitCount.current} />
             ) : currentSpread === 2 ? (
               <Spread2Left />
+            ) : currentSpread === 3 ? (
+              <ProjectPage projectIndex={0} />
+            ) : currentSpread === 4 ? (
+              <ProjectPage projectIndex={2} />
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
@@ -81,6 +86,10 @@ const Book: React.FC = () => {
               <Spread1Right />
             ) : currentSpread === 2 ? (
               <Spread2Right />
+            ) : currentSpread === 3 ? (
+              <ProjectPage projectIndex={1} />
+            ) : currentSpread === 4 ? (
+              <ProjectPage projectIndex={3} />
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
