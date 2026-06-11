@@ -9,6 +9,7 @@ import Spread1Right from '../spreads/Spread1Right';
 import { Spread2Left, Spread2Right } from '../spreads/Spread2';
 import ProjectPage from '../spreads/ProjectPage';
 import Spread5Left from '../spreads/Spread5Left';
+import Spread5Right from '../spreads/Spread5Right';
 import styles from './Book.module.css';
 
 const Book: React.FC = () => {
@@ -94,13 +95,7 @@ const Book: React.FC = () => {
             ) : currentSpread === 4 ? (
               <ProjectPage projectIndex={3} />
             ) : currentSpread === 5 ? (
-              /* right page is placeholder for spread 5 */
-              <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>{spreadIcon}</span>
-                <span className={styles.placeholderLabel}>
-                  Spread {currentSpread} · Right
-                </span>
-              </div>
+              <Spread5Right />
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
