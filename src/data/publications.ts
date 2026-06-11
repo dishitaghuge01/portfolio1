@@ -1,22 +1,39 @@
-import type { Publication } from "../types";
+export interface ResearchPaper {
+  id: string;
+  title: string;
+  status: 'under-review' | 'in-progress';
+  description: string;
+  tags: string[];
+  progressPercent?: number;
+  expectedVenue?: string;
+  link?: string;
+}
 
-export const publications: Publication[] = [
+export const papers: ResearchPaper[] = [
   {
-    title: "Latent Space Analysis for Architectural Floorplan Generation",
-    venue: "CVPR Workshop on Generative Models",
-    year: 2024,
-    link: "#",
+    id: 'archiintel-paper',
+    title: 'Graph-Based Spatial Syntax for Multi-Dimensional Floorplan Quality Scoring',
+    status: 'under-review',
+    description:
+      'Proposes a graph-theoretic framework for encoding architectural floor plans as ' +
+      'spatial syntax graphs, extracting 25 multi-dimensional quality metrics across ' +
+      'circulation, zoning, adjacency, and spatial syntax dimensions to produce a ' +
+      'unified Design Quality Index (DQI).',
+    tags: ['Computer Vision', 'Graph ML', 'Spatial AI', 'Architecture'],
+    link: '#',
   },
   {
-    title: "Structural Knowledge Graphs for Built Environment Understanding",
-    venue: "NeurIPS Workshop",
-    year: 2024,
-    link: "#",
-  },
-  {
-    title: "High-Throughput Distributed Storage for Large-Scale ML Pipelines",
-    venue: "MLSys Conference",
-    year: 2025,
-    link: "#",
+    id: 'pqc-paper',
+    title:
+      'Post-Quantum Cryptographic Authentication and Anti-Forgery Framework for ' +
+      'Printed Indian Railways Tickets',
+    status: 'in-progress',
+    description:
+      'Designs a quantum-resistant authentication system for physical railway tickets ' +
+      'using lattice-based cryptography and steganographic anti-forgery markers, ' +
+      'resilient against both classical and quantum adversaries.',
+    tags: ['Post-Quantum Cryptography', 'Security', 'Applied ML'],
+    progressPercent: 45,
+    expectedVenue: 'IEEE Security & Privacy 2026',
   },
 ];
