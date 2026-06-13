@@ -10,6 +10,7 @@ import { Spread2Left, Spread2Right } from '../spreads/Spread2';
 import ProjectPage from '../spreads/ProjectPage';
 import Spread5Left from '../spreads/Spread5Left';
 import Spread5Right from '../spreads/Spread5Right';
+import Spread6Left from '../spreads/Spread6Left';
 import styles from './Book.module.css';
 
 const Book: React.FC = () => {
@@ -70,6 +71,8 @@ const Book: React.FC = () => {
               <ProjectPage projectIndex={2} />
             ) : currentSpread === 5 ? (
               <Spread5Left />
+            ) : currentSpread === 6 ? (
+              <Spread6Left />
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
@@ -96,6 +99,13 @@ const Book: React.FC = () => {
               <ProjectPage projectIndex={3} />
             ) : currentSpread === 5 ? (
               <Spread5Right />
+            ) : currentSpread === 6 ? (
+              <div className={styles.placeholder}>
+                <span className={styles.placeholderIcon}>{spreadIcon}</span>
+                <span className={styles.placeholderLabel}>
+                  Spread {currentSpread} · Right
+                </span>
+              </div>
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
