@@ -1,16 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useBook } from '../../contexts/BookContext';
 import { spreadsMeta } from '../../data/spreads';
+import { spreadRegistry } from '../../registry/spreadRegistry';
 import BookPage from './BookPage';
 import BookSpine from './BookSpine';
 import SpreadCounter from './SpreadCounter';
-import Spread1Left from '../spreads/Spread1Left';
-import Spread1Right from '../spreads/Spread1Right';
-import { Spread2Left, Spread2Right } from '../spreads/Spread2';
-import ProjectPage from '../spreads/ProjectPage';
-import Spread5Left from '../spreads/Spread5Left';
-import Spread5Right from '../spreads/Spread5Right';
-import Spread6Left from '../spreads/Spread6Left';
 import styles from './Book.module.css';
 
 const Book: React.FC = () => {
@@ -23,8 +17,11 @@ const Book: React.FC = () => {
     flipDirection,
   } = useBook();
 
-  // Track how many times spread 1 has been entered — passed as animationKey
-  // so Spread1Left re-runs its intro animation on each return visit.
+  // Track how many times spread 1 is entered.
+  // Instead of passing animationKey as a prop (registry components are zero-prop),
+  // we pass it as the React `key` on the left BookPage — forcing a full remount
+  // of its children (including Spread1LeftWrapper) on each return visit, which
+  // re-triggers the animation useEffect naturally.
   const spread1VisitCount = useRef(0);
   const prevSpreadRef     = useRef<number | null>(null);
 
@@ -47,32 +44,33 @@ const Book: React.FC = () => {
 
   const spreadIcon = spreadsMeta[currentSpread - 1]?.icon ?? '📄';
 
-  const leftDisabled  = currentSpread === 1            || isFlipping;
+  const leftDisabled  = currentSpread === 1           || isFlipping;
   const rightDisabled = currentSpread === totalSpreads || isFlipping;
+
+  // Look up registered components for the current spread
+  const entry          = spreadRegistry[currentSpread];
+  const LeftComponent  = entry?.left  ?? null;
+  const RightComponent = entry?.right ?? null;
 
   return (
     <div className={styles.scene}>
       <div className={styles.wrapper}>
         {/* Physical book */}
         <div className={styles.book}>
-          {/* Left page */}
+
+          {/* Left page — keyed so spread 1 remounts on each visit */}
           <BookPage
+            key={
+              currentSpread === 1
+                ? `spread1-${spread1VisitCount.current}`
+                : `spread-${currentSpread}-left`
+            }
             side="left"
             isFlipping={isFlipping}
             flipDirection={flipDirection}
           >
-            {currentSpread === 1 ? (
-              <Spread1Left animationKey={spread1VisitCount.current} />
-            ) : currentSpread === 2 ? (
-              <Spread2Left />
-            ) : currentSpread === 3 ? (
-              <ProjectPage projectIndex={0} />
-            ) : currentSpread === 4 ? (
-              <ProjectPage projectIndex={2} />
-            ) : currentSpread === 5 ? (
-              <Spread5Left />
-            ) : currentSpread === 6 ? (
-              <Spread6Left />
+            {LeftComponent ? (
+              <LeftComponent />
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
@@ -85,27 +83,13 @@ const Book: React.FC = () => {
 
           {/* Right page */}
           <BookPage
+            key={`spread-${currentSpread}-right`}
             side="right"
             isFlipping={isFlipping}
             flipDirection={flipDirection}
           >
-            {currentSpread === 1 ? (
-              <Spread1Right />
-            ) : currentSpread === 2 ? (
-              <Spread2Right />
-            ) : currentSpread === 3 ? (
-              <ProjectPage projectIndex={1} />
-            ) : currentSpread === 4 ? (
-              <ProjectPage projectIndex={3} />
-            ) : currentSpread === 5 ? (
-              <Spread5Right />
-            ) : currentSpread === 6 ? (
-              <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>{spreadIcon}</span>
-                <span className={styles.placeholderLabel}>
-                  Spread {currentSpread} · Right
-                </span>
-              </div>
+            {RightComponent ? (
+              <RightComponent />
             ) : (
               <div className={styles.placeholder}>
                 <span className={styles.placeholderIcon}>{spreadIcon}</span>
