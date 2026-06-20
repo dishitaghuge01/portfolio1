@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BookProvider } from './contexts/BookContext';
 import { spreadsMeta } from './data/spreads';
 import Book from './components/book/Book';
-import ThemeToggle from './components/book/ThemeToggle';
+import LampChain from './components/book/LampChain';
 import type { Theme } from './types/index';
 
 const App: React.FC = () => {
@@ -22,7 +22,7 @@ const App: React.FC = () => {
         <Book />
       </BookProvider>
 
-      <ThemeToggle theme={theme} onToggle={toggleTheme} />
+      <LampChain theme={theme} onToggle={toggleTheme} />
     </>
   );
 };
