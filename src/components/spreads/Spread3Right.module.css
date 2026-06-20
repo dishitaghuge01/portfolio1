@@ -11,7 +11,7 @@
 /* ── Spread label ────────────────────────────────────────────────────────────── */
 .spreadLabel {
   font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.2em;
   color: var(--text-muted);
@@ -22,7 +22,7 @@
 /* ── Project title ───────────────────────────────────────────────────────────── */
 .title {
   font-family: 'Instrument Serif', serif;
-  font-size: 48px;
+  font-size: 60px;
   font-weight: 400;
   color: var(--text-primary);
   line-height: 1;
@@ -48,7 +48,7 @@
 
 .descText {
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
@@ -63,7 +63,7 @@
 
 .techLabel {
   font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.15em;
   color: var(--text-muted);
@@ -95,7 +95,7 @@
 
 .statNumber {
   font-family: 'Instrument Serif', serif;
-  font-size: 24px;
+  font-size: 30px;
   color: var(--accent-primary);
   line-height: 1;
   margin: 0;
@@ -103,7 +103,7 @@
 
 .statLabel {
   font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--text-muted);
   line-height: 1.3;
   margin: 0;

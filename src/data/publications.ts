@@ -11,8 +11,8 @@ export interface ResearchPaper {
 
 export const papers: ResearchPaper[] = [
   {
-    id: 'archiintel-paper',
-    title: 'Graph-Based Spatial Syntax for Multi-Dimensional Floorplan Quality Scoring',
+    id: 'ArchIntel-paper',
+    title: 'ArchIntel: Graph-Based Spatial Syntax for Multi-Dimensional Floorplan Quality Scoring',
     status: 'under-review',
     description:
       'Proposes a graph-theoretic framework for encoding architectural floor plans as ' +
@@ -32,7 +32,7 @@ export const papers: ResearchPaper[] = [
       'Designs a quantum-resistant authentication system for physical railway tickets ' +
       'using lattice-based cryptography and steganographic anti-forgery markers, ' +
       'resilient against both classical and quantum adversaries.',
-    tags: ['Post-Quantum Cryptography', 'Security', 'Applied ML'],
+    tags: ['Post-Quantum Cryptography', 'Lattice Cryptography', 'Network Security'],
     progressPercent: 45,
     expectedVenue: 'IEEE Security & Privacy 2026',
   },

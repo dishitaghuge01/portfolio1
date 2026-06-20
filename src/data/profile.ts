@@ -10,17 +10,17 @@ export const profile = {
 export const socialLinks: SocialLink[] = [
   {
     platform: "github",
-    url: "https://github.com/placeholder",
+    url: "https://github.com/dishitaghuge01",
     label: "GitHub",
   },
   {
     platform: "linkedin",
-    url: "https://linkedin.com/in/placeholder",
+    url: "https://www.linkedin.com/in/dishitaghuge/",
     label: "LinkedIn",
   },
   {
     platform: "gmail",
-    url: "mailto:placeholder@gmail.com",
+    url: "mailto:ghugedishita@gmail.com",
     label: "Gmail",
   },
 ];

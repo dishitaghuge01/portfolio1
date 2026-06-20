@@ -63,7 +63,7 @@
   -webkit-backdrop-filter: var(--glass-blur);
   padding: 0 16px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--text-primary);
   box-sizing: border-box;
   outline: none;
