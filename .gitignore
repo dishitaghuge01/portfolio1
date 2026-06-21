@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python venv (scripts/)
+scripts/.venv
+scripts/__pycache__
+*.pyc
+
+# HuggingFace / sentence-transformers model cache (if downloaded locally during script runs)
+scripts/.cache
+
+# OS
+Thumbs.db
