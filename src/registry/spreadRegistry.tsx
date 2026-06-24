@@ -1,6 +1,6 @@
 import React from 'react';
 import Spread1Left from '../components/spreads/Spread1Left';
-import Spread1Right from '../components/spreads/Spread1Right';
+import EmbeddingSpace from '../components/spreads/EmbeddingSpace';
 import { Spread2Left, Spread2Right } from '../components/spreads/Spread2';
 import ProjectPage from '../components/spreads/ProjectPage';
 import Spread5Left from '../components/spreads/Spread5Left';
@@ -33,7 +33,8 @@ export const spreadRegistry: Record<
   number,
   { left: React.ComponentType; right: React.ComponentType | null }
 > = {
-  1: { left: Spread1LeftWrapper, right: Spread1Right   },
+  // TEMP: testing EmbeddingSpace, revert to Spread1Right after review
+  1: { left: Spread1LeftWrapper, right: EmbeddingSpace },
   2: { left: Spread2Left,        right: Spread2Right   },
   3: { left: Project0,           right: Project1       },
   4: { left: Project2,           right: Project3       },
