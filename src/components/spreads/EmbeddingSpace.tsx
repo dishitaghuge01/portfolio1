@@ -438,19 +438,21 @@ export default function EmbeddingSpace() {
       });
 
       // interaction
-      g.on("mouseenter", function (_, d) {
+      g.on("mouseenter", function (event, d) {
         setHover(d);
-        const svgRect = svgRef.current!.getBoundingClientRect();
         const wrapRect = wrapRef.current!.getBoundingClientRect();
-        const nodeScreenX = (d.x / 100) * w;
-        const nodeScreenY = (d.y / 100) * h;
-        nodePosRef.current = {
-          x: svgRect.left - wrapRect.left + nodeScreenX,
-          y: svgRect.top - wrapRect.top + nodeScreenY,
-        };
-        setMousePos({ ...nodePosRef.current });
+        setMousePos({
+          x: event.clientX - wrapRect.left,
+          y: event.clientY - wrapRect.top,
+        });
         d3.select(this).select("circle.halo").transition().duration(250).attr("opacity", 0.55).attr("r", d.type === "project" ? 34 : 24);
         d3.select(this).select("circle.core").transition().duration(250).attr("r", d.type === "project" ? 6 : 4);
+      }).on("mousemove", function (event) {
+        const wrapRect = wrapRef.current!.getBoundingClientRect();
+        setMousePos({
+          x: event.clientX - wrapRect.left,
+          y: event.clientY - wrapRect.top,
+        });
       }).on("mouseleave", function (_, d) {
         setHover(null);
         d3.select(this).select("circle.halo").transition().duration(300).attr("opacity", 0.18).attr("r", d.type === "project" ? 22 : 14);
@@ -567,20 +569,6 @@ export default function EmbeddingSpace() {
     return () => ro.disconnect();
   }, [queryResults]);
 
-  // Placeholder text reflects model load state
-  const placeholderText =
-    modelState === 'ready'
-      ? "Try: 'cryptography' or 'natural language processing'"
-      : modelState === 'error'
-        ? "Model failed to load"
-        : "Warming up model…";
-
-  // Pulsing dot color reflects model load state
-  const dotColor =
-    modelState === 'ready' ? '#34d399' : modelState === 'error' ? '#fb7185' : '#fbbf24';
-  const dotGlow =
-    modelState === 'ready' ? '#10b981' : modelState === 'error' ? '#f43f5e' : '#f59e0b';
-
   return (
     <div
       ref={wrapRef}
@@ -591,113 +579,27 @@ export default function EmbeddingSpace() {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        background: '#000',
         fontFamily: "'Inter', system-ui, sans-serif",
         color: '#e5e7eb',
         borderRadius: '12px',
       }}
     >
-      <canvas
-        ref={canvasRef}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0, borderRadius: 'inherit' }}
-      />
-      <svg ref={svgRef} style={{ display: "block", width: "100%", height: "100%", position: "relative", zIndex: 1 }} />
+      <div style={{ position: 'relative', flex: 1, overflow: 'hidden', width: '100%' }}>
+        <canvas
+          ref={canvasRef}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0, borderRadius: 'inherit' }}
+        />
+        <svg ref={svgRef} style={{ display: "block", width: "100%", height: "100%", position: "relative", zIndex: 1 }} />
 
-      {/* Legend */}
-      <div
-        style={{
-          position: "absolute",
-          top: 12,
-          right: 16,
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          fontSize: 10,
-          letterSpacing: "0.15em",
-          color: "rgba(229,231,235,0.75)",
-        }}
-      >
-        {Object.values(CLUSTERS).map((c) => (
-          <div key={c.name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 999,
-                background: c.color,
-                boxShadow: `0 0 12px ${c.glow}`,
-              }}
-            />
-            <span style={{ textTransform: "uppercase" }}>{c.name}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Hover tooltip — positioned adjacent to the hovered node, label only */}
-      {hover && (
+        {/* Search bar — overlays the bottom of the starfield, does not push it up */}
         <div
           style={{
             position: "absolute",
-            left: nodePosRef.current.x,
-            top: nodePosRef.current.y - 32,
-            background: "rgba(0,0,0,0.75)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: 999,
-            padding: "5px 14px",
-            fontSize: 12,
-            color: "rgba(255,255,255,0.9)",
-            letterSpacing: "0.08em",
-            backdropFilter: "blur(8px)",
-            pointerEvents: "none",
-            whiteSpace: "nowrap",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <div style={{ pointerEvents: "none" }}>{hover.label}</div>
-
-          {hover.type === 'project' && PROJECT_SPREAD_MAP[hover.id] && (
-            <button
-              onClick={() => goToSpread(PROJECT_SPREAD_MAP[hover.id])}
-              style={{
-                pointerEvents: "auto",
-                cursor: "pointer",
-                padding: "3px 12px",
-                borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.2)",
-                background: "rgba(255,255,255,0.06)",
-                color: "rgba(255,255,255,0.9)",
-                fontSize: 10,
-                letterSpacing: "0.08em",
-                fontFamily: "inherit",
-              }}
-            >
-              → View project
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Search bar */}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 12,
-          display: "flex",
-          justifyContent: "center",
-          padding: "0 12px",
-          pointerEvents: "none",
-        }}
-      >
-        <div
-          style={{
-            pointerEvents: "auto",
-            width: "min(500px, 100%)",
-            position: "relative",
+            bottom: "16px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "min(480px, 90%)",
+            zIndex: 10,
           }}
         >
           <div
@@ -724,20 +626,21 @@ export default function EmbeddingSpace() {
               backdropFilter: "blur(14px)",
             }}
           >
-            <div
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 999,
-                background: dotColor,
-                boxShadow: `0 0 12px ${dotGlow}`,
-                animation: "pulse 1.8s ease-in-out infinite",
-              }}
-            />
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ flexShrink: 0 }}
+            >
+              <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
+              <line x1="9" y1="9" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
             <input
               value={query}
               onChange={(e) => { setQuery(e.target.value); handleQuery(e.target.value); }}
-              placeholder={placeholderText}
+              placeholder='Try "cryptography"'
               disabled={modelState !== 'ready'}
               style={{
                 flex: 1,
@@ -750,39 +653,33 @@ export default function EmbeddingSpace() {
                 fontFamily: "inherit",
               }}
             />
-            <div
-              style={{
-                fontSize: 10,
-                letterSpacing: "0.3em",
-                color: "rgba(229,231,235,0.5)",
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-              }}
-            >
-              ⌁ all-MiniLM-L6-v2
-            </div>
-          </div>
-          <div
-            style={{
-              marginTop: 10,
-              textAlign: "center",
-              fontSize: 10,
-              letterSpacing: "0.3em",
-              color: "rgba(229,231,235,0.35)",
-              textTransform: "uppercase",
-            }}
-          >
-            In-browser semantic search · 36 nodes · 6 constellations
           </div>
         </div>
       </div>
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.7); }
-        }
-      `}</style>
+      {/* Hover tooltip — absolute positioning relative to wrapper */}
+      {hover && (
+        <div
+          style={{
+            position: "absolute",
+            left: mousePos.x + 12,
+            top: mousePos.y - 40,
+            zIndex: 9999,
+            background: "rgba(0,0,0,0.85)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: 999,
+            padding: "5px 14px",
+            fontSize: 12,
+            color: "rgba(255,255,255,0.9)",
+            letterSpacing: "0.08em",
+            backdropFilter: "blur(8px)",
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {hover.label}
+        </div>
+      )}
     </div>
   );
 }
