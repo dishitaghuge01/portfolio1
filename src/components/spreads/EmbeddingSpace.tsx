@@ -70,6 +70,7 @@ export default function EmbeddingSpace() {
   const [query, setQuery] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [noResults, setNoResults] = useState(false);
+  const [topProjectMatch, setTopProjectMatch] = useState<NodeT | null>(null);
   const nodePosRef = useRef({ x: 0, y: 0 });
 
   const { goToSpread } = useBook();
@@ -94,20 +95,29 @@ export default function EmbeddingSpace() {
     if (text.length < 3) {
       setNoResults(false);
       setQueryResults(null);
+      setTopProjectMatch(null);
       return;
     }
     debounceRef.current = setTimeout(async () => {
       setNoResults(false);
+      setTopProjectMatch(null);
       try {
         const vector = await embedQuery(text);
         const neighbors = findNearestNeighbors(vector, NODES as any, 3);
         if (!hasStrongMatch(neighbors, 0.35)) {
           setNoResults(true);
           setQueryResults(null);
+          setTopProjectMatch(null);
           return;
         }
         const position = computeWeightedCentroid(neighbors as any);
         setQueryResults({ position, neighbors: neighbors as any });
+        const topMatch = neighbors[0];
+        if (topMatch?.node.type === 'project' && PROJECT_SPREAD_MAP[topMatch.node.id]) {
+          setTopProjectMatch(topMatch.node);
+        } else {
+          setTopProjectMatch(null);
+        }
       } catch (e) {
         console.error('Query failed:', e);
       }
@@ -635,6 +645,45 @@ export default function EmbeddingSpace() {
             zIndex: 10,
           }}
         >
+          {topProjectMatch && (
+            <div
+              role="button"
+              onClick={() => {
+                const spreadId = PROJECT_SPREAD_MAP[topProjectMatch.id];
+                if (spreadId) {
+                  goToSpread(spreadId);
+                }
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(1.2)")}
+              onMouseLeave={(e) => (e.currentTarget.style.filter = "brightness(1)")}
+              style={{
+                position: "absolute",
+                bottom: "100%",
+                left: "50%",
+                transform: "translateX(-50%)",
+                marginBottom: 10,
+                padding: "8px 16px",
+                borderRadius: 999,
+                background: "rgba(6,8,20,0.88)",
+                border: "1px solid rgba(125,211,252,0.25)",
+                backdropFilter: "blur(14px)",
+                color: "#e5e7eb",
+                fontSize: 12,
+                letterSpacing: "0.04em",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                transition: "opacity 250ms ease, filter 150ms ease",
+                opacity: 1,
+                zIndex: 11,
+              }}
+            >
+              <span style={{ opacity: 0.88 }}>Top match:</span>
+              <span style={{ fontWeight: 700, color: "#7dd3fc" }}>{topProjectMatch.label}</span>
+              <span style={{ opacity: 0.78 }}>&rarr;</span>
+            </div>
+          )}
           <div
             style={{
               position: "absolute",
