@@ -54,12 +54,12 @@
     radial-gradient(ellipse 55% 70% at 75% 50%, rgba(120, 80, 220, 0.06), transparent 70%);
 }
 
-/* ── Click zones ────────────────────────────────────────────────────────────── */
+/* ── Click zones — thin 40px edge strips, content never blocked ──────────────── */
 .clickZone {
   position: absolute;
   top: 0;
   height: 100%;
-  width: 30%;
+  width: 40px;
   z-index: 30;
   background: transparent;
   transition: background 0.3s ease;
@@ -96,6 +96,57 @@
 .zoneDisabled {
   pointer-events: none;
   cursor: default;
+}
+
+/* ── Swipe hint text — Spread 1 only ──────────────────────────────────────────── */
+.swipeHint {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 25;
+  pointer-events: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.12em;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.swipeHintVisible {
+  opacity: 1;
+}
+
+/* ── One-time hint toast ────────────────────────────────────────────────────────── */
+.hintToast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.hintVisible {
+  opacity: 1;
 }
 
 /* ── Placeholder content ────────────────────────────────────────────────────── */

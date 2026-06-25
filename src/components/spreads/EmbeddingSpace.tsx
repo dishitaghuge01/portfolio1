@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import rawData from '../../data/embeddingSpace.json';
 import { useBook } from '../../contexts/BookContext';
+import styles from './EmbeddingSpace.module.css';
 import {
   embedQuery,
   subscribeModelState,
@@ -66,14 +67,245 @@ export default function EmbeddingSpace() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const svgSelRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined> | null>(null);
+  const nodeLayerRef = useRef<d3.Selection<SVGGElement, unknown, null, undefined> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const [hover, setHover] = useState<NodeT | null>(null);
   const [query, setQuery] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [noResults, setNoResults] = useState(false);
   const [topProjectMatch, setTopProjectMatch] = useState<NodeT | null>(null);
-  const nodePosRef = useRef({ x: 0, y: 0 });
 
   const { goToSpread } = useBook();
+
+  const renderStaticSvg = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+    wrap: HTMLDivElement,
+  ) => {
+    let w = wrap.clientWidth;
+    let h = wrap.clientHeight;
+    svg.attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h);
+
+    svg.selectAll("*").remove();
+
+    const defs = svg.append("defs");
+
+    // Radial nebula gradients per cluster
+    Object.entries(CLUSTERS).forEach(([key, c]) => {
+      const g = defs
+        .append("radialGradient")
+        .attr("id", `neb-${key}`)
+        .attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
+      g.append("stop").attr("offset", "0%").attr("stop-color", c.glow).attr("stop-opacity", 0.45);
+      g.append("stop").attr("offset", "55%").attr("stop-color", c.color).attr("stop-opacity", 0.08);
+      g.append("stop").attr("offset", "100%").attr("stop-color", c.color).attr("stop-opacity", 0);
+    });
+
+    // Star gradient (white core to transparent)
+    const starG = defs.append("radialGradient").attr("id", "star-core");
+    starG.append("stop").attr("offset", "0%").attr("stop-color", "#ffffff").attr("stop-opacity", 1);
+    starG.append("stop").attr("offset", "40%").attr("stop-color", "#ffffff").attr("stop-opacity", 0.8);
+    starG.append("stop").attr("offset", "100%").attr("stop-color", "#ffffff").attr("stop-opacity", 0);
+
+    // Glow filter
+    const f = defs.append("filter").attr("id", "glow").attr("x", "-100%").attr("y", "-100%").attr("width", "300%").attr("height", "300%");
+    f.append("feGaussianBlur").attr("stdDeviation", "3").attr("result", "b");
+    const merge = f.append("feMerge");
+    merge.append("feMergeNode").attr("in", "b");
+    merge.append("feMergeNode").attr("in", "SourceGraphic");
+
+    const bigGlow = defs.append("filter").attr("id", "bigGlow").attr("x", "-200%").attr("y", "-200%").attr("width", "500%").attr("height", "500%");
+    bigGlow.append("feGaussianBlur").attr("stdDeviation", "8").attr("result", "b");
+    const m2 = bigGlow.append("feMerge");
+    m2.append("feMergeNode").attr("in", "b");
+    m2.append("feMergeNode").attr("in", "SourceGraphic");
+
+    // Deep space gradient bg
+    const bg = defs.append("radialGradient").attr("id", "spaceBg").attr("cx", "50%").attr("cy", "45%").attr("r", "75%");
+    bg.append("stop").attr("offset", "0%").attr("stop-color", "#0b1029");
+    bg.append("stop").attr("offset", "60%").attr("stop-color", "#05060f");
+    bg.append("stop").attr("offset", "100%").attr("stop-color", "#000003");
+
+    svg.append("rect").attr("width", w).attr("height", h).attr("fill", "url(#spaceBg)");
+
+    // Nebula clouds per cluster
+    const nebLayer = svg.append("g").attr("class", "nebula-layer");
+    Object.entries(CLUSTERS).forEach(([key, c]) => {
+      nebLayer
+        .append("ellipse")
+        .attr("cx", (c.cx / 100) * w)
+        .attr("cy", (c.cy / 100) * h)
+        .attr("rx", Math.min(w, h) * 0.28)
+        .attr("ry", Math.min(w, h) * 0.22)
+        .attr("fill", `url(#neb-${key})`)
+        .attr("opacity", 0.9);
+    });
+
+    // Backdrop tiny stars
+    const rand = mulberry32(42);
+    const bgStars = svg.append("g").attr("class", "bg-stars");
+    const STAR_COUNT = Math.floor((w * h) / 2200);
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const cx = rand() * w;
+      const cy = rand() * h;
+      const r = rand() * 1.2 + 0.2;
+      const o = rand() * 0.7 + 0.15;
+      const s = bgStars
+        .append("circle")
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", r)
+        .attr("fill", "#ffffff")
+        .attr("opacity", o);
+      const dur = 1500 + rand() * 4000;
+      s.append("animate")
+        .attr("attributeName", "opacity")
+        .attr("values", `${o};${Math.max(0.05, o - 0.5)};${o}`)
+        .attr("dur", `${dur}ms`)
+        .attr("repeatCount", "indefinite");
+    }
+
+    // Distant dust streaks
+    const dust = svg.append("g").attr("opacity", 0.25);
+    for (let i = 0; i < 6; i++) {
+      dust
+        .append("ellipse")
+        .attr("cx", rand() * w)
+        .attr("cy", rand() * h)
+        .attr("rx", 200 + rand() * 300)
+        .attr("ry", 1 + rand() * 2)
+        .attr("fill", "#7dd3fc")
+        .attr("opacity", 0.07)
+        .attr("transform", `rotate(${rand() * 360} ${rand() * w} ${rand() * h})`);
+    }
+
+    // Constellation lines (within cluster, nearest neighbours)
+    const lineLayer = svg.append("g").attr("class", "lines");
+    const byCluster = d3.group(NODES, (d) => d.cluster);
+    byCluster.forEach((arr) => {
+      arr.forEach((a) => {
+        const others = arr
+          .filter((b) => b.id !== a.id)
+          .map((b) => ({ b, d: Math.hypot(a.x - b.x, a.y - b.y) }))
+          .sort((x, y) => x.d - y.d)
+          .slice(0, 2);
+        others.forEach(({ b }) => {
+          lineLayer
+            .append("line")
+            .attr("x1", (a.x / 100) * w)
+            .attr("y1", (a.y / 100) * h)
+            .attr("x2", (b.x / 100) * w)
+            .attr("y2", (b.y / 100) * h)
+            .attr("stroke", CLUSTERS[a.cluster].color)
+            .attr("stroke-opacity", 0.18)
+            .attr("stroke-width", 0.6);
+        });
+      });
+    });
+
+    // Nodes
+    const nodeLayer = svg.append("g").attr("class", "nodes");
+    const g = nodeLayer
+      .selectAll("g.node")
+      .data(NODES)
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr("transform", (d) => `translate(${(d.x / 100) * w},${(d.y / 100) * h})`)
+      .style("cursor", "pointer");
+
+    g.append("circle")
+      .attr("r", (d) => (d.type === "project" ? 22 : 14))
+      .attr("fill", (d) => CLUSTERS[d.cluster].glow)
+      .attr("opacity", 0.18)
+      .attr("filter", "url(#bigGlow)")
+      .attr("class", "halo");
+
+    g.append("circle")
+      .attr("r", (d) => (d.type === "project" ? 6.5 : 4))
+      .attr("fill", "none")
+      .attr("stroke", (d) => CLUSTERS[d.cluster].color)
+      .attr("stroke-opacity", 0.9)
+      .attr("stroke-width", 1)
+      .attr("filter", "url(#glow)");
+
+    g.append("circle")
+      .attr("r", (d) => (d.type === "project" ? 4 : 2.4))
+      .attr("fill", "url(#star-core)")
+      .attr("class", "core");
+
+    g.filter((d) => d.type === "project")
+      .each(function (d) {
+        const sel = d3.select(this);
+        const len = 18;
+        const col = CLUSTERS[d.cluster].color;
+        [[0, -len, 0, len], [-len, 0, len, 0]].forEach(([x1, y1, x2, y2]) => {
+          sel.append("line")
+            .attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2)
+            .attr("stroke", col).attr("stroke-opacity", 0.55)
+            .attr("stroke-width", 0.6).attr("filter", "url(#glow)");
+        });
+      });
+
+    g.append("circle")
+      .attr("r", (d) => (d.type === "project" ? 6.5 : 4))
+      .attr("fill", "none")
+      .attr("stroke", (d) => CLUSTERS[d.cluster].color)
+      .attr("stroke-opacity", 0.6)
+      .attr("stroke-width", 0.8)
+      .each(function (_, i) {
+        const sel = d3.select(this);
+        sel.append("animate")
+          .attr("attributeName", "r")
+          .attr("values", `4;14;4`)
+          .attr("dur", `${3000 + (i % 5) * 400}ms`)
+          .attr("repeatCount", "indefinite");
+        sel.append("animate")
+          .attr("attributeName", "stroke-opacity")
+          .attr("values", `0.6;0;0.6`)
+          .attr("dur", `${3000 + (i % 5) * 400}ms`)
+          .attr("repeatCount", "indefinite");
+      });
+
+    g.each(function (_, i) {
+      const sel = d3.select(this);
+      const baseX = (NODES[i].x / 100) * w;
+      const baseY = (NODES[i].y / 100) * h;
+      const dx = 2 + (i % 3);
+      const dy = 1.5 + (i % 4);
+      const dur = 6000 + (i * 137) % 5000;
+      sel.append("animateTransform")
+        .attr("attributeName", "transform")
+        .attr("type", "translate")
+        .attr("values", `${baseX},${baseY}; ${baseX + dx},${baseY - dy}; ${baseX - dx},${baseY + dy}; ${baseX},${baseY}`)
+        .attr("dur", `${dur}ms`)
+        .attr("repeatCount", "indefinite");
+    });
+
+    g.on("mouseenter", function (event, d) {
+      setHover(d);
+      const wrapRect = wrapRef.current!.getBoundingClientRect();
+      setMousePos({
+        x: event.clientX - wrapRect.left,
+        y: event.clientY - wrapRect.top,
+      });
+      d3.select(this).select("circle.halo").transition().duration(250).attr("opacity", 0.55).attr("r", d.type === "project" ? 34 : 24);
+      d3.select(this).select("circle.core").transition().duration(250).attr("r", d.type === "project" ? 6 : 4);
+    }).on("mousemove", function (event) {
+      const wrapRect = wrapRef.current!.getBoundingClientRect();
+      setMousePos({
+        x: event.clientX - wrapRect.left,
+        y: event.clientY - wrapRect.top,
+      });
+    }).on("mouseleave", function (_, d) {
+      setHover(null);
+      d3.select(this).select("circle.halo").transition().duration(300).attr("opacity", 0.18).attr("r", d.type === "project" ? 22 : 14);
+      d3.select(this).select("circle.core").transition().duration(300).attr("r", d.type === "project" ? 4 : 2.4);
+    });
+
+    svgSelRef.current = svg;
+    nodeLayerRef.current = nodeLayer;
+  };
 
   // ── Semantic search state ──────────────────────────────────────────────────
   const [modelState, setModelState] = useState<ModelLoadState>('idle');
@@ -92,7 +324,34 @@ export default function EmbeddingSpace() {
 
   const handleQuery = async (text: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    
+    if (modelState === 'error') {
+      // Fallback: substring match on node labels
+      const lower = text.toLowerCase();
+      const matches = NODES
+        .filter(n => n.label.toLowerCase().includes(lower))
+        .slice(0, 3);
+      if (matches.length === 0) {
+        setNoResults(true);
+        setQueryResults(null);
+        setTopProjectMatch(null);
+        return;
+      }
+      const fakeNeighbors = matches.map(node => ({ node, score: 1.0 }));
+      const position = computeWeightedCentroid(fakeNeighbors as any);
+      setQueryResults({ position, neighbors: fakeNeighbors as any });
+      setNoResults(false);
+      if (matches[0].type === 'project' && PROJECT_SPREAD_MAP[matches[0].id]) {
+        setTopProjectMatch(matches[0]);
+      } else {
+        setTopProjectMatch(null);
+      }
+      return;
+    }
+    
     if (text.length < 3) {
+      abortRef.current?.abort();
+      abortRef.current = null;
       setNoResults(false);
       setQueryResults(null);
       setTopProjectMatch(null);
@@ -101,24 +360,38 @@ export default function EmbeddingSpace() {
     debounceRef.current = setTimeout(async () => {
       setNoResults(false);
       setTopProjectMatch(null);
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
       try {
         const vector = await embedQuery(text);
+        if (abortRef.current !== controller) return;
         const neighbors = findNearestNeighbors(vector, NODES as any, 3);
         if (!hasStrongMatch(neighbors, 0.35)) {
+          if (abortRef.current !== controller) return;
           setNoResults(true);
           setQueryResults(null);
           setTopProjectMatch(null);
+          abortRef.current = null;
           return;
         }
         const position = computeWeightedCentroid(neighbors as any);
+        if (abortRef.current !== controller) return;
         setQueryResults({ position, neighbors: neighbors as any });
         const topMatch = neighbors[0];
+        if (abortRef.current !== controller) return;
         if (topMatch?.node.type === 'project' && PROJECT_SPREAD_MAP[topMatch.node.id]) {
           setTopProjectMatch(topMatch.node);
         } else {
           setTopProjectMatch(null);
         }
+        if (abortRef.current === controller) {
+          abortRef.current = null;
+        }
       } catch (e) {
+        if (abortRef.current === controller) {
+          abortRef.current = null;
+        }
         console.error('Query failed:', e);
       }
     }, 400);
@@ -242,374 +515,153 @@ export default function EmbeddingSpace() {
   useEffect(() => {
     const svg = d3.select(svgRef.current!);
     const wrap = wrapRef.current!;
-    let w = wrap.clientWidth;
-    let h = wrap.clientHeight;
-
-    const render = () => {
-      w = wrap.clientWidth;
-      h = wrap.clientHeight;
-      svg.attr("viewBox", `0 0 ${w} ${h}`).attr("width", w).attr("height", h);
-
-      svg.selectAll("*").remove();
-
-      const defs = svg.append("defs");
-
-      // Radial nebula gradients per cluster
-      Object.entries(CLUSTERS).forEach(([key, c]) => {
-        const g = defs
-          .append("radialGradient")
-          .attr("id", `neb-${key}`)
-          .attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
-        g.append("stop").attr("offset", "0%").attr("stop-color", c.glow).attr("stop-opacity", 0.45);
-        g.append("stop").attr("offset", "55%").attr("stop-color", c.color).attr("stop-opacity", 0.08);
-        g.append("stop").attr("offset", "100%").attr("stop-color", c.color).attr("stop-opacity", 0);
-      });
-
-      // Star gradient (white core to transparent)
-      const starG = defs.append("radialGradient").attr("id", "star-core");
-      starG.append("stop").attr("offset", "0%").attr("stop-color", "#ffffff").attr("stop-opacity", 1);
-      starG.append("stop").attr("offset", "40%").attr("stop-color", "#ffffff").attr("stop-opacity", 0.8);
-      starG.append("stop").attr("offset", "100%").attr("stop-color", "#ffffff").attr("stop-opacity", 0);
-
-      // Glow filter
-      const f = defs.append("filter").attr("id", "glow").attr("x", "-100%").attr("y", "-100%").attr("width", "300%").attr("height", "300%");
-      f.append("feGaussianBlur").attr("stdDeviation", "3").attr("result", "b");
-      const merge = f.append("feMerge");
-      merge.append("feMergeNode").attr("in", "b");
-      merge.append("feMergeNode").attr("in", "SourceGraphic");
-
-      const bigGlow = defs.append("filter").attr("id", "bigGlow").attr("x", "-200%").attr("y", "-200%").attr("width", "500%").attr("height", "500%");
-      bigGlow.append("feGaussianBlur").attr("stdDeviation", "8").attr("result", "b");
-      const m2 = bigGlow.append("feMerge");
-      m2.append("feMergeNode").attr("in", "b");
-      m2.append("feMergeNode").attr("in", "SourceGraphic");
-
-      // Deep space gradient bg
-      const bg = defs.append("radialGradient").attr("id", "spaceBg").attr("cx", "50%").attr("cy", "45%").attr("r", "75%");
-      bg.append("stop").attr("offset", "0%").attr("stop-color", "#0b1029");
-      bg.append("stop").attr("offset", "60%").attr("stop-color", "#05060f");
-      bg.append("stop").attr("offset", "100%").attr("stop-color", "#000003");
-
-      svg.append("rect").attr("width", w).attr("height", h).attr("fill", "url(#spaceBg)");
-
-      // Nebula clouds per cluster
-      const nebLayer = svg.append("g").attr("class", "nebula-layer");
-      Object.entries(CLUSTERS).forEach(([key, c]) => {
-        nebLayer
-          .append("ellipse")
-          .attr("cx", (c.cx / 100) * w)
-          .attr("cy", (c.cy / 100) * h)
-          .attr("rx", Math.min(w, h) * 0.28)
-          .attr("ry", Math.min(w, h) * 0.22)
-          .attr("fill", `url(#neb-${key})`)
-          .attr("opacity", 0.9);
-      });
-
-      // Backdrop tiny stars
-      const rand = mulberry32(42);
-      const bgStars = svg.append("g").attr("class", "bg-stars");
-      const STAR_COUNT = Math.floor((w * h) / 2200);
-      for (let i = 0; i < STAR_COUNT; i++) {
-        const cx = rand() * w;
-        const cy = rand() * h;
-        const r = rand() * 1.2 + 0.2;
-        const o = rand() * 0.7 + 0.15;
-        const s = bgStars
-          .append("circle")
-          .attr("cx", cx)
-          .attr("cy", cy)
-          .attr("r", r)
-          .attr("fill", "#ffffff")
-          .attr("opacity", o);
-        // twinkle
-        const dur = 1500 + rand() * 4000;
-        s.append("animate")
-          .attr("attributeName", "opacity")
-          .attr("values", `${o};${Math.max(0.05, o - 0.5)};${o}`)
-          .attr("dur", `${dur}ms`)
-          .attr("repeatCount", "indefinite");
-      }
-
-      // Distant dust streaks
-      const dust = svg.append("g").attr("opacity", 0.25);
-      for (let i = 0; i < 6; i++) {
-        dust
-          .append("ellipse")
-          .attr("cx", rand() * w)
-          .attr("cy", rand() * h)
-          .attr("rx", 200 + rand() * 300)
-          .attr("ry", 1 + rand() * 2)
-          .attr("fill", "#7dd3fc")
-          .attr("opacity", 0.07)
-          .attr("transform", `rotate(${rand() * 360} ${rand() * w} ${rand() * h})`);
-      }
-
-      // Constellation lines (within cluster, nearest neighbours)
-      const lineLayer = svg.append("g").attr("class", "lines");
-      const byCluster = d3.group(NODES, (d) => d.cluster);
-      byCluster.forEach((arr) => {
-        // connect each node to its nearest 2 in cluster
-        arr.forEach((a) => {
-          const others = arr
-            .filter((b) => b.id !== a.id)
-            .map((b) => ({ b, d: Math.hypot(a.x - b.x, a.y - b.y) }))
-            .sort((x, y) => x.d - y.d)
-            .slice(0, 2);
-          others.forEach(({ b }) => {
-            lineLayer
-              .append("line")
-              .attr("x1", (a.x / 100) * w)
-              .attr("y1", (a.y / 100) * h)
-              .attr("x2", (b.x / 100) * w)
-              .attr("y2", (b.y / 100) * h)
-              .attr("stroke", CLUSTERS[a.cluster].color)
-              .attr("stroke-opacity", 0.18)
-              .attr("stroke-width", 0.6);
-          });
-        });
-      });
-
-      // Nodes
-      const nodeLayer = svg.append("g").attr("class", "nodes");
-      const g = nodeLayer
-        .selectAll("g.node")
-        .data(NODES)
-        .enter()
-        .append("g")
-        .attr("class", "node")
-        .attr("transform", (d) => `translate(${(d.x / 100) * w},${(d.y / 100) * h})`)
-        .style("cursor", "pointer");
-
-      // outer glow halo
-      g.append("circle")
-        .attr("r", (d) => (d.type === "project" ? 22 : 14))
-        .attr("fill", (d) => CLUSTERS[d.cluster].glow)
-        .attr("opacity", 0.18)
-        .attr("filter", "url(#bigGlow)")
-        .attr("class", "halo");
-
-      // colored ring
-      g.append("circle")
-        .attr("r", (d) => (d.type === "project" ? 6.5 : 4))
-        .attr("fill", "none")
-        .attr("stroke", (d) => CLUSTERS[d.cluster].color)
-        .attr("stroke-opacity", 0.9)
-        .attr("stroke-width", 1)
-        .attr("filter", "url(#glow)");
-
-      // white core
-      g.append("circle")
-        .attr("r", (d) => (d.type === "project" ? 4 : 2.4))
-        .attr("fill", "url(#star-core)")
-        .attr("class", "core");
-
-      // diffraction spikes for projects
-      g.filter((d) => d.type === "project")
-        .each(function (d) {
-          const sel = d3.select(this);
-          const len = 18;
-          const col = CLUSTERS[d.cluster].color;
-          [
-            [0, -len, 0, len],
-            [-len, 0, len, 0],
-          ].forEach(([x1, y1, x2, y2]) => {
-            sel.append("line")
-              .attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2)
-              .attr("stroke", col).attr("stroke-opacity", 0.55)
-              .attr("stroke-width", 0.6).attr("filter", "url(#glow)");
-          });
-        });
-
-      // pulse animation
-      g.append("circle")
-        .attr("r", (d) => (d.type === "project" ? 6.5 : 4))
-        .attr("fill", "none")
-        .attr("stroke", (d) => CLUSTERS[d.cluster].color)
-        .attr("stroke-opacity", 0.6)
-        .attr("stroke-width", 0.8)
-        .each(function (_, i) {
-          const sel = d3.select(this);
-          sel.append("animate")
-            .attr("attributeName", "r")
-            .attr("values", `4;14;4`)
-            .attr("dur", `${3000 + (i % 5) * 400}ms`)
-            .attr("repeatCount", "indefinite");
-          sel.append("animate")
-            .attr("attributeName", "stroke-opacity")
-            .attr("values", `0.6;0;0.6`)
-            .attr("dur", `${3000 + (i % 5) * 400}ms`)
-            .attr("repeatCount", "indefinite");
-        });
-
-      // gentle float
-      g.each(function (_, i) {
-        const sel = d3.select(this);
-        const baseX = (NODES[i].x / 100) * w;
-        const baseY = (NODES[i].y / 100) * h;
-        const dx = 2 + (i % 3);
-        const dy = 1.5 + (i % 4);
-        const dur = 6000 + (i * 137) % 5000;
-        sel.append("animateTransform")
-          .attr("attributeName", "transform")
-          .attr("type", "translate")
-          .attr("values", `${baseX},${baseY}; ${baseX + dx},${baseY - dy}; ${baseX - dx},${baseY + dy}; ${baseX},${baseY}`)
-          .attr("dur", `${dur}ms`)
-          .attr("repeatCount", "indefinite");
-      });
-
-      // interaction
-      g.on("mouseenter", function (event, d) {
-        setHover(d);
-        const wrapRect = wrapRef.current!.getBoundingClientRect();
-        setMousePos({
-          x: event.clientX - wrapRect.left,
-          y: event.clientY - wrapRect.top,
-        });
-        d3.select(this).select("circle.halo").transition().duration(250).attr("opacity", 0.55).attr("r", d.type === "project" ? 34 : 24);
-        d3.select(this).select("circle.core").transition().duration(250).attr("r", d.type === "project" ? 6 : 4);
-      }).on("mousemove", function (event) {
-        const wrapRect = wrapRef.current!.getBoundingClientRect();
-        setMousePos({
-          x: event.clientX - wrapRect.left,
-          y: event.clientY - wrapRect.top,
-        });
-      }).on("mouseleave", function (_, d) {
-        setHover(null);
-        d3.select(this).select("circle.halo").transition().duration(300).attr("opacity", 0.18).attr("r", d.type === "project" ? 22 : 14);
-        d3.select(this).select("circle.core").transition().duration(300).attr("r", d.type === "project" ? 4 : 2.4);
-      });
-
-      // ── Query results — added node, dashed connection lines, neighbor highlight ──
-      if (queryResults) {
-        const qx = (queryResults.position.x / 100) * w;
-        const qy = (queryResults.position.y / 100) * h;
-
-        const queryLayer = svg.append("g").attr("class", "query-layer").attr("opacity", 0);
-
-        // Dashed lines from query node to each matched neighbor, "drawing in"
-        queryResults.neighbors.forEach(({ node }) => {
-          const nx = (node.x / 100) * w;
-          const ny = (node.y / 100) * h;
-          const dist = Math.hypot(nx - qx, ny - qy);
-
-          queryLayer
-            .append("line")
-            .attr("x1", qx).attr("y1", qy)
-            .attr("x2", nx).attr("y2", ny)
-            .attr("stroke", "#ffffff")
-            .attr("stroke-opacity", 0.7)
-            .attr("stroke-width", 1)
-            .attr("stroke-dasharray", "4 4")
-            .attr("stroke-dashoffset", dist)
-            .call((sel) => {
-              sel.append("animate")
-                .attr("attributeName", "stroke-dashoffset")
-                .attr("from", dist)
-                .attr("to", 0)
-                .attr("dur", "700ms")
-                .attr("fill", "freeze");
-            });
-
-          // Briefly scale up / brighten the matched neighbor's halo + core
-          nodeLayer
-            .selectAll<SVGGElement, NodeT>("g.node")
-            .filter((d) => d.id === node.id)
-            .each(function (d) {
-              d3.select(this).select("circle.halo")
-                .transition().duration(300)
-                .attr("opacity", 0.6)
-                .attr("r", d.type === "project" ? 30 : 20);
-              d3.select(this).select("circle.core")
-                .transition().duration(300)
-                .attr("r", d.type === "project" ? 6 : 4);
-            });
-
-          const labelX = (node.x / 100) * w;
-          const labelY = (node.y / 100) * h - 18;
-
-          queryLayer
-            .append("text")
-            .attr("x", labelX)
-            .attr("y", labelY)
-            .attr("text-anchor", "middle")
-            .attr("fill", "rgba(0,0,0,0.8)")
-            .attr("stroke", "rgba(0,0,0,0.8)")
-            .attr("stroke-width", 3)
-            .attr("font-family", "'Inter', system-ui, sans-serif")
-            .attr("font-size", 10)
-            .attr("font-weight", 500)
-            .attr("letter-spacing", "0.08em")
-            .attr("opacity", 0)
-            .attr("pointer-events", "none")
-            .text(node.label);
-
-          queryLayer
-            .append("text")
-            .attr("x", labelX)
-            .attr("y", labelY)
-            .attr("text-anchor", "middle")
-            .attr("fill", "#ffffff")
-            .attr("font-family", "'Inter', system-ui, sans-serif")
-            .attr("font-size", 10)
-            .attr("font-weight", 500)
-            .attr("letter-spacing", "0.08em")
-            .attr("opacity", 0)
-            .attr("pointer-events", "none")
-            .text(node.label)
-            .transition().delay(400).duration(300).attr("opacity", 1);
-        });
-
-        // Query node itself — white pulsing circle with crosshair, labeled "QUERY"
-        const queryNode = queryLayer.append("g").attr("transform", `translate(${qx},${qy})`);
-
-        queryNode.append("circle")
-          .attr("r", 16)
-          .attr("fill", "#ffffff")
-          .attr("opacity", 0.15)
-          .attr("filter", "url(#bigGlow)");
-
-        queryNode.append("circle")
-          .attr("r", 5)
-          .attr("fill", "none")
-          .attr("stroke", "#ffffff")
-          .attr("stroke-width", 1)
-          .attr("filter", "url(#glow)")
-          .each(function () {
-            const sel = d3.select(this);
-            sel.append("animate")
-              .attr("attributeName", "r")
-              .attr("values", "5;11;5")
-              .attr("dur", "1800ms")
-              .attr("repeatCount", "indefinite");
-            sel.append("animate")
-              .attr("attributeName", "stroke-opacity")
-              .attr("values", "1;0;1")
-              .attr("dur", "1800ms")
-              .attr("repeatCount", "indefinite");
-          });
-
-        // Crosshair
-        [[0, -10, 0, 10], [-10, 0, 10, 0]].forEach(([x1, y1, x2, y2]) => {
-          queryNode.append("line")
-            .attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2)
-            .attr("stroke", "#ffffff")
-            .attr("stroke-opacity", 0.8)
-            .attr("stroke-width", 0.8);
-        });
-
-        queryNode.append("circle")
-          .attr("r", 2.2)
-          .attr("fill", "url(#star-core)");
-
-        // Fade the whole query layer in
-        queryLayer.transition().duration(250).attr("opacity", 1);
-      }
-    };
+    const render = () => renderStaticSvg(svg, wrap);
 
     render();
-    const ro = new ResizeObserver(render);
+    const ro = new ResizeObserver(() => render());
     ro.observe(wrap);
     return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const svg = svgSelRef.current;
+    const nodeLayer = nodeLayerRef.current;
+    const wrap = wrapRef.current;
+    if (!svg || !nodeLayer || !wrap) return;
+
+    svg.select('.query-layer').remove();
+
+    nodeLayer.selectAll<SVGGElement, NodeT>('g.node').each(function (d) {
+      d3.select(this).select('circle.halo')
+        .transition().duration(200)
+        .attr('opacity', 0.18)
+        .attr('r', d.type === 'project' ? 22 : 14);
+      d3.select(this).select('circle.core')
+        .transition().duration(200)
+        .attr('r', d.type === 'project' ? 4 : 2.4);
+    });
+
+    if (!queryResults) return;
+
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
+    const qx = (queryResults.position.x / 100) * w;
+    const qy = (queryResults.position.y / 100) * h;
+    const queryLayer = svg.append('g').attr('class', 'query-layer').attr('opacity', 0);
+
+    queryResults.neighbors.forEach(({ node }) => {
+      const nx = (node.x / 100) * w;
+      const ny = (node.y / 100) * h;
+      const dist = Math.hypot(nx - qx, ny - qy);
+
+      queryLayer
+        .append('line')
+        .attr('x1', qx).attr('y1', qy)
+        .attr('x2', nx).attr('y2', ny)
+        .attr('stroke', '#ffffff')
+        .attr('stroke-opacity', 0.7)
+        .attr('stroke-width', 1)
+        .attr('stroke-dasharray', '4 4')
+        .attr('stroke-dashoffset', dist)
+        .call((sel) => {
+          sel.append('animate')
+            .attr('attributeName', 'stroke-dashoffset')
+            .attr('from', dist)
+            .attr('to', 0)
+            .attr('dur', '700ms')
+            .attr('fill', 'freeze');
+        });
+
+      nodeLayer
+        .selectAll<SVGGElement, NodeT>('g.node')
+        .filter((d) => d.id === node.id)
+        .each(function (d) {
+          d3.select(this).select('circle.halo')
+            .transition().duration(300)
+            .attr('opacity', 0.6)
+            .attr('r', d.type === 'project' ? 30 : 20);
+          d3.select(this).select('circle.core')
+            .transition().duration(300)
+            .attr('r', d.type === 'project' ? 6 : 4);
+        });
+
+      const labelX = nx;
+      const labelY = ny - 18;
+
+      queryLayer
+        .append('text')
+        .attr('x', labelX)
+        .attr('y', labelY)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'rgba(0,0,0,0.8)')
+        .attr('stroke', 'rgba(0,0,0,0.8)')
+        .attr('stroke-width', 3)
+        .attr('font-family', "'Inter', system-ui, sans-serif")
+        .attr('font-size', 10)
+        .attr('font-weight', 500)
+        .attr('letter-spacing', '0.08em')
+        .attr('opacity', 0)
+        .attr('pointer-events', 'none')
+        .text(node.label);
+
+      queryLayer
+        .append('text')
+        .attr('x', labelX)
+        .attr('y', labelY)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#ffffff')
+        .attr('font-family', "'Inter', system-ui, sans-serif")
+        .attr('font-size', 10)
+        .attr('font-weight', 500)
+        .attr('letter-spacing', '0.08em')
+        .attr('opacity', 0)
+        .attr('pointer-events', 'none')
+        .text(node.label)
+        .transition().delay(400).duration(300).attr('opacity', 1);
+    });
+
+    const queryNode = queryLayer.append('g').attr('transform', `translate(${qx},${qy})`);
+
+    queryNode.append('circle')
+      .attr('r', 16)
+      .attr('fill', '#ffffff')
+      .attr('opacity', 0.15)
+      .attr('filter', 'url(#bigGlow)');
+
+    queryNode.append('circle')
+      .attr('r', 5)
+      .attr('fill', 'none')
+      .attr('stroke', '#ffffff')
+      .attr('stroke-width', 1)
+      .attr('filter', 'url(#glow)')
+      .each(function () {
+        const sel = d3.select(this);
+        sel.append('animate')
+          .attr('attributeName', 'r')
+          .attr('values', '5;11;5')
+          .attr('dur', '1800ms')
+          .attr('repeatCount', 'indefinite');
+        sel.append('animate')
+          .attr('attributeName', 'stroke-opacity')
+          .attr('values', '1;0;1')
+          .attr('dur', '1800ms')
+          .attr('repeatCount', 'indefinite');
+      });
+
+    [[0, -10, 0, 10], [-10, 0, 10, 0]].forEach(([x1, y1, x2, y2]) => {
+      queryNode.append('line')
+        .attr('x1', x1).attr('y1', y1)
+        .attr('x2', x2).attr('y2', y2)
+        .attr('stroke', '#ffffff')
+        .attr('stroke-opacity', 0.8)
+        .attr('stroke-width', 0.8);
+    });
+
+    queryNode.append('circle')
+      .attr('r', 2.2)
+      .attr('fill', 'url(#star-core)');
+
+    queryLayer.transition().duration(250).attr('opacity', 1);
   }, [queryResults]);
 
   return (
@@ -708,22 +760,45 @@ export default function EmbeddingSpace() {
               backdropFilter: "blur(14px)",
             }}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ flexShrink: 0 }}
-            >
-              <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
-              <line x1="9" y1="9" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            {/* Magnifying glass icon or spinner */}
+            <div style={{ position: 'relative', width: 16, height: 16, flexShrink: 0 }}>
+              {modelState === 'loading' ? (
+                <div className={styles.spinningLoader} />
+              ) : (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ 
+                    opacity: modelState === 'idle' ? 0.3 : 1,
+                    transition: 'opacity 200ms ease'
+                  }}
+                >
+                  <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
+                  <line x1="9" y1="9" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              )}
+              {modelState === 'error' && (
+                <div
+                  className={styles.warningDot}
+                  title="Semantic model unavailable — using keyword search"
+                  style={{ position: 'absolute', bottom: -2, right: -2 }}
+                />
+              )}
+            </div>
+
             <input
               value={query}
               onChange={(e) => { setQuery(e.target.value); handleQuery(e.target.value); }}
-              placeholder='Try "cryptography"'
-              disabled={modelState !== 'ready'}
+              placeholder={
+                modelState === 'idle' ? 'Initializing…' :
+                modelState === 'loading' ? 'Loading model…' :
+                modelState === 'error' ? 'Search skills…' :
+                'Try "cryptography"'
+              }
+              disabled={modelState === 'idle' || modelState === 'loading'}
               style={{
                 flex: 1,
                 background: "transparent",
@@ -733,6 +808,7 @@ export default function EmbeddingSpace() {
                 fontSize: 12,
                 letterSpacing: "0.05em",
                 fontFamily: "inherit",
+                opacity: modelState === 'idle' ? 0.5 : 1,
               }}
             />
             {noResults && (
