@@ -69,6 +69,7 @@ export default function EmbeddingSpace() {
   const [hover, setHover] = useState<NodeT | null>(null);
   const [query, setQuery] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [noResults, setNoResults] = useState(false);
   const nodePosRef = useRef({ x: 0, y: 0 });
 
   const { goToSpread } = useBook();
@@ -90,12 +91,21 @@ export default function EmbeddingSpace() {
 
   const handleQuery = async (text: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (text.length < 3) { setQueryResults(null); return; }
+    if (text.length < 3) {
+      setNoResults(false);
+      setQueryResults(null);
+      return;
+    }
     debounceRef.current = setTimeout(async () => {
+      setNoResults(false);
       try {
         const vector = await embedQuery(text);
         const neighbors = findNearestNeighbors(vector, NODES as any, 3);
-        if (!hasStrongMatch(neighbors)) { setQueryResults(null); return; }
+        if (!hasStrongMatch(neighbors, 0.35)) {
+          setNoResults(true);
+          setQueryResults(null);
+          return;
+        }
         const position = computeWeightedCentroid(neighbors as any);
         setQueryResults({ position, neighbors: neighbors as any });
       } catch (e) {
@@ -503,6 +513,40 @@ export default function EmbeddingSpace() {
                 .transition().duration(300)
                 .attr("r", d.type === "project" ? 6 : 4);
             });
+
+          const labelX = (node.x / 100) * w;
+          const labelY = (node.y / 100) * h - 18;
+
+          queryLayer
+            .append("text")
+            .attr("x", labelX)
+            .attr("y", labelY)
+            .attr("text-anchor", "middle")
+            .attr("fill", "rgba(0,0,0,0.8)")
+            .attr("stroke", "rgba(0,0,0,0.8)")
+            .attr("stroke-width", 3)
+            .attr("font-family", "'Inter', system-ui, sans-serif")
+            .attr("font-size", 10)
+            .attr("font-weight", 500)
+            .attr("letter-spacing", "0.08em")
+            .attr("opacity", 0)
+            .attr("pointer-events", "none")
+            .text(node.label);
+
+          queryLayer
+            .append("text")
+            .attr("x", labelX)
+            .attr("y", labelY)
+            .attr("text-anchor", "middle")
+            .attr("fill", "#ffffff")
+            .attr("font-family", "'Inter', system-ui, sans-serif")
+            .attr("font-size", 10)
+            .attr("font-weight", 500)
+            .attr("letter-spacing", "0.08em")
+            .attr("opacity", 0)
+            .attr("pointer-events", "none")
+            .text(node.label)
+            .transition().delay(400).duration(300).attr("opacity", 1);
         });
 
         // Query node itself — white pulsing circle with crosshair, labeled "QUERY"
@@ -546,17 +590,6 @@ export default function EmbeddingSpace() {
         queryNode.append("circle")
           .attr("r", 2.2)
           .attr("fill", "url(#star-core)");
-
-        queryNode.append("text")
-          .attr("y", -20)
-          .attr("text-anchor", "middle")
-          .attr("fill", "#ffffff")
-          .attr("font-family", "'Inter', system-ui, sans-serif")
-          .attr("font-size", 9)
-          .attr("font-weight", 600)
-          .attr("letter-spacing", "0.25em")
-          .attr("opacity", 0.85)
-          .text("QUERY");
 
         // Fade the whole query layer in
         queryLayer.transition().duration(250).attr("opacity", 1);
@@ -653,6 +686,21 @@ export default function EmbeddingSpace() {
                 fontFamily: "inherit",
               }}
             />
+            {noResults && (
+              <div
+                style={{
+                  fontSize: 10,
+                  color: 'rgba(255,255,255,0.35)',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  pointerEvents: 'none',
+                  paddingRight: 4,
+                }}
+              >
+                no strong matches found
+              </div>
+            )}
           </div>
         </div>
       </div>
