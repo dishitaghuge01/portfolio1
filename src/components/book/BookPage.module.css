@@ -19,82 +19,55 @@
   border-radius: 0 8px 8px 0;
 }
 
-/* ── Flip animations ────────────────────────────────────────────────────────── */
-.flipForwardRight {
-  animation: flipForwardRight 600ms cubic-bezier(0.4, 0.0, 0.2, 1.0) forwards;
+/* ── Flip animations — out (outgoing page folds away) / in (incoming page
+   unfolds into place). Total flip = 600ms: 300ms out, then 300ms in starting
+   at the 300ms mark, finishing at 600ms — exactly when BookContext swaps
+   currentSpread and this page's children become the new content. ────────────── */
+
+.flipOutForward {
   transform-origin: left center;
+  animation: flipOutForward 300ms ease-in none;
 }
 
-.flipBackwardLeft {
-  animation: flipBackwardLeft 600ms cubic-bezier(0.4, 0.0, 0.2, 1.0) forwards;
+.flipInForward {
   transform-origin: right center;
+  animation: flipInForward 300ms ease-out forwards;
 }
 
-/*
- * Two-phase forward flip with edge-on linger (right page, spine pivot at left):
- *
- *   0%  →  40%:  0deg  → -85deg   fast approach, decelerating into edge-on
- *   40% →  50%:  -85deg → -90deg  near-crawl — the linger; only 5° in 10% of time
- *   50% →  60%:  -90deg → -95deg  slow departure from edge-on, just past seam
- *   60% → 100%:  -95deg → -180deg re-acceleration to flat on the other side
- *
- * The tight 10-degree window (40%–60%) means the animation dwells at 90°
- * long enough for the eye to register the thin vertical sliver before the
- * page opens on the other side. Shadow peaks at -90° and falls away quickly.
- */
-@keyframes flipForwardRight {
-  0% {
-    transform: rotateY(0deg);
-    box-shadow: none;
-  }
-  40% {
-    transform: rotateY(-85deg);
-    box-shadow: -18px 0 50px 8px var(--flip-shadow);
-  }
-  50% {
-    transform: rotateY(-90deg);
-    box-shadow: -20px 0 60px 10px var(--flip-shadow);
-  }
-  60% {
-    transform: rotateY(-95deg);
-    box-shadow: -14px 0 40px 6px var(--flip-shadow);
-  }
-  100% {
-    transform: rotateY(-180deg);
-    box-shadow: none;
-  }
+.flipOutBackward {
+  transform-origin: right center;
+  animation: flipOutBackward 300ms ease-in none;
 }
 
-/*
- * Two-phase backward flip with edge-on linger (left page, spine pivot at right):
- *   Mirror of flipForwardRight — positive Y rotation, rightward shadow.
- *
- *   0%  →  40%:  0deg  →  85deg
- *   40% →  50%:  85deg →  90deg  linger at edge-on
- *   50% →  60%:  90deg →  95deg  slow departure past seam
- *   60% → 100%:  95deg → 180deg  re-acceleration to flat
- */
-@keyframes flipBackwardLeft {
-  0% {
-    transform: rotateY(0deg);
-    box-shadow: none;
-  }
-  40% {
-    transform: rotateY(85deg);
-    box-shadow: 18px 0 50px 8px var(--flip-shadow);
-  }
-  50% {
-    transform: rotateY(90deg);
-    box-shadow: 20px 0 60px 10px var(--flip-shadow);
-  }
-  60% {
-    transform: rotateY(95deg);
-    box-shadow: 14px 0 40px 6px var(--flip-shadow);
-  }
-  100% {
-    transform: rotateY(180deg);
-    box-shadow: none;
-  }
+.flipInBackward {
+  transform-origin: left center;
+  animation: flipInBackward 300ms ease-out forwards;
+}
+
+/* ── Keyframes — forward flip ──────────────────────────────────────────────────── */
+/* Right page (outgoing): folds away 0° → -90°, pivoting at the spine (left edge) */
+@keyframes flipOutForward {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(-90deg); }
+}
+
+/* Left page (incoming): unfolds -90° → 0°, pivoting at the spine (right edge) */
+@keyframes flipInForward {
+  from { transform: rotateY(-90deg); }
+  to   { transform: rotateY(0deg); }
+}
+
+/* ── Keyframes — backward flip, mirrored ─────────────────────────────────────── */
+/* Left page (outgoing): folds away 0° → 90°, pivoting at the spine (right edge) */
+@keyframes flipOutBackward {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(90deg); }
+}
+
+/* Right page (incoming): unfolds 90° → 0°, pivoting at the spine (left edge) */
+@keyframes flipInBackward {
+  from { transform: rotateY(90deg); }
+  to   { transform: rotateY(0deg); }
 }
 
 /* ── Inner content wrapper ──────────────────────────────────────────────────── */

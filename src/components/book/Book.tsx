@@ -8,6 +8,14 @@ import SpreadCounter from './SpreadCounter';
 import styles from './Book.module.css';
 
 const WHEEL_COOLDOWN_MS = 800;
+const MIDPOINT_MS = 300;
+
+type RegistryEntry = { left: React.ComponentType; right: React.ComponentType | null } | null;
+
+const getEntry = (totalSpreads: number, spreadIndex: number): RegistryEntry => {
+  if (spreadIndex < 1 || spreadIndex > totalSpreads) return null;
+  return spreadRegistry[spreadIndex] ?? null;
+};
 
 const Book: React.FC = () => {
   const {
@@ -20,10 +28,6 @@ const Book: React.FC = () => {
   } = useBook();
 
   // Track how many times spread 1 is entered.
-  // Instead of passing animationKey as a prop (registry components are zero-prop),
-  // we pass it as the React `key` on the left BookPage — forcing a full remount
-  // of its children (including Spread1LeftWrapper) on each return visit, which
-  // re-triggers the animation useEffect naturally.
   const spread1VisitCount = useRef(0);
   const prevSpreadRef     = useRef<number | null>(null);
 
@@ -53,9 +57,9 @@ const Book: React.FC = () => {
     if (!bookDiv) return;
 
     const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return; // ignore vertical scroll
-      if (Math.abs(e.deltaX) < 30) return; // ignore tiny movements
-      if (isWheelCoolingRef.current) return; // ignore while cooling down
+      if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+      if (Math.abs(e.deltaX) < 30) return;
+      if (isWheelCoolingRef.current) return;
 
       e.preventDefault();
 
@@ -103,7 +107,6 @@ const Book: React.FC = () => {
     return () => clearTimeout(showTimer);
   }, [currentSpread]);
 
-  // Auto-hide 8s after the hint becomes visible
   useEffect(() => {
     if (!showSwipeHint) return;
 
@@ -114,22 +117,81 @@ const Book: React.FC = () => {
     return () => clearTimeout(autoHideTimer);
   }, [showSwipeHint]);
 
-  // Dismiss the swipe hint as soon as a flip starts, on either page
   useEffect(() => {
     if (isFlipping) {
       setShowSwipeHint(false);
     }
   }, [isFlipping]);
 
-  const spreadIcon = spreadsMeta[currentSpread - 1]?.icon ?? '📄';
-
   const leftDisabled  = currentSpread === 1           || isFlipping;
   const rightDisabled = currentSpread === totalSpreads || isFlipping;
 
-  // Look up registered components for the current spread
-  const entry          = spreadRegistry[currentSpread];
-  const LeftComponent  = entry?.left  ?? null;
-  const RightComponent = entry?.right ?? null;
+  // ── Four-slot content model, swapped at the 300ms midpoint ───────────────────
+  //
+  // A flip has four distinct content pieces, but only two BookPage slots:
+  //   0°→90°   left shows CURRENT spread's left   (static while right folds away)
+  //            right shows CURRENT spread's right (outgoing, animating away)
+  //   90°→180° left shows NEXT spread's left       (incoming, animating in)
+  //            right shows NEXT spread's right     (static, newly revealed)
+  //
+  // So each BookPage slot shows two different pieces of content over the
+  // course of one flip — switched via a setTimeout at the 300ms midpoint,
+  // entirely independent of when BookContext flips `currentSpread` (600ms).
+  // This is tracked as React state (not derived inline) so the swap is a
+  // real, scheduled event rather than something recomputed from props that
+  // can drift out of sync with the animation's actual visual midpoint.
+  const [leftContent, setLeftContent]   = useState<React.ComponentType | null>(null);
+  const [rightContent, setRightContent] = useState<React.ComponentType | null>(null);
+  const [leftSpreadShown, setLeftSpreadShown]   = useState(currentSpread);
+  const [rightSpreadShown, setRightSpreadShown] = useState(currentSpread);
+
+  const midpointTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Idle: always reflect currentSpread's own left/right directly.
+  useEffect(() => {
+    if (isFlipping) return;
+
+    const entry = getEntry(totalSpreads, currentSpread);
+    setLeftContent(() => entry?.left ?? null);
+    setRightContent(() => entry?.right ?? null);
+    setLeftSpreadShown(currentSpread);
+    setRightSpreadShown(currentSpread);
+  }, [currentSpread, isFlipping, totalSpreads]);
+
+  // Flip start: schedule the midpoint swap to next spread's content at 300ms.
+  useEffect(() => {
+    if (!isFlipping) return;
+
+    if (midpointTimerRef.current !== null) {
+      clearTimeout(midpointTimerRef.current);
+    }
+
+    const nextSpreadIndex = flipDirection === 'forward' ? currentSpread + 1 : currentSpread - 1;
+    const nextEntry = getEntry(totalSpreads, nextSpreadIndex);
+
+    midpointTimerRef.current = setTimeout(() => {
+      // Both slots swap to the next spread's content at 90° — left becomes
+      // the incoming page's left, right becomes the newly-revealed right.
+      setLeftContent(() => nextEntry?.left ?? null);
+      setRightContent(() => nextEntry?.right ?? null);
+      setLeftSpreadShown(nextSpreadIndex);
+      setRightSpreadShown(nextSpreadIndex);
+      midpointTimerRef.current = null;
+    }, MIDPOINT_MS);
+
+    return () => {
+      if (midpointTimerRef.current !== null) {
+        clearTimeout(midpointTimerRef.current);
+        midpointTimerRef.current = null;
+      }
+    };
+  }, [isFlipping, flipDirection, currentSpread, totalSpreads]);
+
+  const DisplayLeftComponent  = leftContent;
+  const DisplayRightComponent = rightContent;
+
+  const leftIcon  = spreadsMeta[leftSpreadShown - 1]?.icon  ?? '📄';
+  const rightIcon = spreadsMeta[rightSpreadShown - 1]?.icon ?? '📄';
 
   return (
     <div className={styles.scene}>
@@ -137,24 +199,25 @@ const Book: React.FC = () => {
         {/* Physical book */}
         <div ref={bookRef} className={styles.book}>
 
-          {/* Left page — keyed so spread 1 remounts on each visit */}
+          {/* Left page — keys stay stable through the whole flip; they only
+              change once currentSpread itself updates at 600ms */}
           <BookPage
             key={
               currentSpread === 1
                 ? `spread1-${spread1VisitCount.current}`
-                : `spread-${currentSpread}-left`
+                : `left-${currentSpread}`
             }
             side="left"
             isFlipping={isFlipping}
             flipDirection={flipDirection}
           >
-            {LeftComponent ? (
-              <LeftComponent />
+            {DisplayLeftComponent ? (
+              <DisplayLeftComponent />
             ) : (
               <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>{spreadIcon}</span>
+                <span className={styles.placeholderIcon}>{leftIcon}</span>
                 <span className={styles.placeholderLabel}>
-                  Spread {currentSpread} · Left
+                  Spread {leftSpreadShown} · Left
                 </span>
               </div>
             )}
@@ -162,18 +225,18 @@ const Book: React.FC = () => {
 
           {/* Right page */}
           <BookPage
-            key={`spread-${currentSpread}-right`}
+            key={`right-${currentSpread}`}
             side="right"
             isFlipping={isFlipping}
             flipDirection={flipDirection}
           >
-            {RightComponent ? (
-              <RightComponent />
+            {DisplayRightComponent ? (
+              <DisplayRightComponent />
             ) : (
               <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>{spreadIcon}</span>
+                <span className={styles.placeholderIcon}>{rightIcon}</span>
                 <span className={styles.placeholderLabel}>
-                  Spread {currentSpread} · Right
+                  Spread {rightSpreadShown} · Right
                 </span>
               </div>
             )}

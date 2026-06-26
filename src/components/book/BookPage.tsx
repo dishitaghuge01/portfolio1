@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './BookPage.module.css';
 
 type Side = 'left' | 'right';
@@ -17,32 +17,44 @@ const BookPage: React.FC<BookPageProps> = ({
   isFlipping = false,
   flipDirection,
 }) => {
-  const isAnimatingForwardRight =
-    isFlipping && flipDirection === 'forward' && side === 'right';
-  const isAnimatingBackwardLeft =
-    isFlipping && flipDirection === 'backward' && side === 'left';
+  const [animationReady, setAnimationReady] = useState(false);
 
-  const classes = [
+  const isIncoming = (isFlipping && flipDirection === 'forward' && side === 'left') ||
+                     (isFlipping && flipDirection === 'backward' && side === 'right');
+  const isOutgoing = (isFlipping && flipDirection === 'forward' && side === 'right') ||
+                     (isFlipping && flipDirection === 'backward' && side === 'left');
+
+  useEffect(() => {
+    if (!isIncoming) {
+      setAnimationReady(false);
+      return;
+    }
+
+    setAnimationReady(false);
+    const timer = setTimeout(() => setAnimationReady(true), 300);
+    return () => clearTimeout(timer);
+  }, [isIncoming]);
+
+  const pageClasses = [
     styles.page,
     side === 'left' ? styles.left : styles.right,
-    isAnimatingForwardRight ? styles.flipForwardRight : '',
-    isAnimatingBackwardLeft ? styles.flipBackwardLeft : '',
+    isOutgoing && flipDirection === 'forward'               ? styles.flipOutForward  : '',
+    isIncoming && animationReady && flipDirection === 'forward'  ? styles.flipInForward   : '',
+    isOutgoing && flipDirection === 'backward'              ? styles.flipOutBackward : '',
+    isIncoming && animationReady && flipDirection === 'backward' ? styles.flipInBackward  : '',
   ]
     .filter(Boolean)
     .join(' ');
 
-  return (
-    <div className={classes}>
-      <div className={styles.inner}>{children}</div>
+  const spineShadowClasses = [
+    styles.spineShadow,
+    side === 'left' ? styles.spineShadowLeft : styles.spineShadowRight,
+  ].join(' ');
 
-      {/* Spine shadow — right edge of left page, left edge of right page */}
-      <div
-        className={[
-          styles.spineShadow,
-          side === 'left' ? styles.spineShadowLeft : styles.spineShadowRight,
-        ].join(' ')}
-        aria-hidden="true"
-      />
+  return (
+    <div className={pageClasses}>
+      <div className={styles.inner}>{children}</div>
+      <div className={spineShadowClasses} aria-hidden="true" />
     </div>
   );
 };
