@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import GlassCircle from '../../components/ui/GlassCircle';
 import { socialLinks } from '../../data/profile';
+import resumePdf from '../../assets/resume.pdf';
 import styles from './Spread1Left.module.css';
 
 // ── Geometry constants ────────────────────────────────────────────────────────
@@ -8,28 +9,43 @@ const CX       = 260;                      // wrapper/SVG center x
 const CY       = 260;                      // wrapper/SVG center y
 const RING_R   = 218;                      // orbital ring radius (8px outside photo edge 210px)
 const TICK_OUT = 228;                      // outer tick endpoint radius
-const LABEL_R  = 245;                      // HTML label anchor radius
+const LABEL_R  = RING_R + 16;              // HTML label anchor radius — 16px outside ring edge
 const INTRO_MS = 4000;                     // ring draw duration (ms)
 const CIRC     = 1370;                    // ≈ 2 * π * 218
 const CHAR_MS  = 60;                       // ms per typewriter character
+const LINE_PAUSE_MS = 200;                 // pause between title and subtitle typing
 
 // Only 3 labels. mathDeg = clockDeg − 90.
 // clockDeg is the visual clockwise-from-12 position.
+// title and subtitle may both contain \n for multi-line text; subtitle may be empty.
 const ORBIT_LABELS = [
-  { label: 'CGPA 9.01',   clockDeg:  60, mathDeg:  -30 },
-  { label: 'YCCE NAGPUR', clockDeg: 120, mathDeg:   30 },
-  { label: '2023 – 2027', clockDeg: 300, mathDeg:  210 },
+  {
+    clockDeg: 60,
+    mathDeg: -30,
+    title: 'YESHWANTRAO CHAVAN COLLEGE\nOF ENGINEERING',
+    subtitle: 'NAGPUR\n2023–27',
+  },
+  {
+    clockDeg: 120,
+    mathDeg: 30,
+    title: 'B.TECH IN CSE',
+    subtitle: 'MINOR IN ROBOTICS & CIM\nCGPA 9.01',
+  },
+  {
+    clockDeg: 300,
+    mathDeg: 210,
+    title: 'I USE ARCH, BTW!',
+    subtitle: '',
+  },
 ];
 
 // Tick marks only at the 3 label clock positions
 const TICK_CLOCK_DEG = [60, 120, 300];
 
-const BADGES: Record<string, string> = {
-  github: 'gh', linkedin: 'in', gmail: 'gm', email: 'gm',
-};
-function getBadge(p: string): string {
-  return BADGES[p.toLowerCase()] ?? p.slice(0, 2).toLowerCase();
-}
+// Resume link — handled locally since SocialLink's platform union doesn't
+// include "resume". If profile.ts's SocialLink type is later widened to
+// include "resume", this can be folded back into socialLinks instead.
+const resumeLink = { platform: 'resume', url: resumePdf, label: 'Resume' };
 
 // Convert math angle (degrees, 0=right, CW positive) to radians
 function toMathRad(mathDeg: number): number {
@@ -45,18 +61,28 @@ function clockToSvgPos(clockDeg: number, r: number) {
 
 // Returns label position and outward transform.
 // mathDeg: standard math angle (0=right, +CW).
-// Right half (−90 to 90): text extends rightward from anchor.
-// Left half (90 to 270): text extends leftward from anchor.
+// Right half (−90 to 90, exclusive of exact top/bottom): text extends rightward.
+// Left half (90 to 270): text extends leftward.
+// Exact top (−90°) and bottom (90°) get their own vertical-push cases.
 function getLabelStyle(mathDeg: number): { left: number; top: number; transform: string } {
   const rad  = toMathRad(mathDeg);
   const left = CX + LABEL_R * Math.cos(rad);
   const top  = CY + LABEL_R * Math.sin(rad);
   // Normalise to 0–360 for the half-plane check
   const norm = ((mathDeg % 360) + 360) % 360;
-  const transform =
-    norm <= 90 || norm >= 270
-      ? 'translate(10px, -50%)'                  // right half → text goes right
-      : 'translate(calc(-100% - 10px), -50%)';   // left half  → text goes left
+
+  let transform: string;
+  if (norm === 270) {
+    // Exact top — push upward, away from the ring
+    transform = 'translate(-50%, calc(-100% - 6px))';
+  } else if (norm === 90) {
+    // Exact bottom — push downward, away from the ring
+    transform = 'translate(-50%, 6px)';
+  } else if (norm <= 90 || norm >= 270) {
+    transform = 'translate(6px, -50%)';                   // right half → text goes right
+  } else {
+    transform = 'translate(calc(-100% - 6px), -50%)';     // left half  → text goes left
+  }
   return { left, top, transform };
 }
 
@@ -81,17 +107,20 @@ interface Spread1LeftProps {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
-  const [labelTexts, setLabelTexts] = useState<string[]>(['', '', '']);
-  const [typing,     setTyping]     = useState<boolean[]>([false, false, false]);
+  // Each label now types its title (possibly multi-line) and subtitle.
+  const [titleTexts, setTitleTexts]       = useState<string[]>(['', '', '']);
+  const [subtitleTexts, setSubtitleTexts] = useState<string[]>(['', '', '']);
+  const [typing, setTyping]               = useState<boolean[]>([false, false, false]);
   // Bumped on each animationKey change to force CSS ring-draw restart via React key
-  const [animCycle,  setAnimCycle]  = useState(0);
+  const [animCycle, setAnimCycle]         = useState(0);
 
   const intervalIdsRef = useRef<ReturnType<typeof setInterval>[]>([]);
   const timeoutIdsRef  = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     // ── Reset ────────────────────────────────────────────────────────────
-    setLabelTexts(['', '', '']);
+    setTitleTexts(['', '', '']);
+    setSubtitleTexts(['', '', '']);
     setTyping([false, false, false]);
     setAnimCycle((c) => c + 1);
 
@@ -100,30 +129,54 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
     timeoutIdsRef.current.forEach(clearTimeout);
     timeoutIdsRef.current = [];
 
-    // ── Typewriter for a single label ────────────────────────────────────
+    // ── Typewriter for one line of a label ───────────────────────────────
+    // Calls onDone when the full line has been typed. No-ops immediately
+    // (calling onDone synchronously) if fullText is empty — covers the
+    // empty-subtitle case (e.g. "I USE ARCH, BTW!").
+    function typeLine(
+      fullText: string,
+      setter: React.Dispatch<React.SetStateAction<string[]>>,
+      index: number,
+      onDone: () => void,
+    ): void {
+      if (fullText.length === 0) {
+        onDone();
+        return;
+      }
+      let charCount = 0;
+      const ivId = setInterval(() => {
+        charCount += 1;
+        const current = fullText.slice(0, charCount);
+        setter((prev) => {
+          const next = [...prev]; next[index] = current; return next;
+        });
+        if (charCount >= fullText.length) {
+          clearInterval(ivId);
+          intervalIdsRef.current = intervalIdsRef.current.filter((id) => id !== ivId);
+          onDone();
+        }
+      }, CHAR_MS);
+      intervalIdsRef.current.push(ivId);
+    }
+
+    // ── Type title, pause, then type subtitle (if any) ───────────────────
     function typeLabel(index: number): void {
-      const fullText = ORBIT_LABELS[index].label;
-      let charCount  = 0;
+      const { title, subtitle } = ORBIT_LABELS[index];
 
       setTyping((prev) => {
         const next = [...prev]; next[index] = true; return next;
       });
 
-      const ivId = setInterval(() => {
-        charCount += 1;
-        const current = fullText.slice(0, charCount);
-        setLabelTexts((prev) => {
-          const next = [...prev]; next[index] = current; return next;
-        });
-        if (charCount >= fullText.length) {
-          clearInterval(ivId);
-          setTyping((prev) => {
-            const next = [...prev]; next[index] = false; return next;
+      typeLine(title, setTitleTexts, index, () => {
+        const pauseId = setTimeout(() => {
+          typeLine(subtitle, setSubtitleTexts, index, () => {
+            setTyping((prev) => {
+              const next = [...prev]; next[index] = false; return next;
+            });
           });
-          intervalIdsRef.current = intervalIdsRef.current.filter((id) => id !== ivId);
-        }
-      }, CHAR_MS);
-      intervalIdsRef.current.push(ivId);
+        }, LINE_PAUSE_MS);
+        timeoutIdsRef.current.push(pauseId);
+      });
     }
 
     // ── Schedule each label by its clock position along the ring draw ────
@@ -134,11 +187,13 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
       timeoutIdsRef.current.push(toId);
     });
 
-    // Safety-net: after full 4s, snap all labels to complete text
+    // Safety-net: after full 4s (+ generous buffer for the two-line type +
+    // pause sequence), snap all labels to complete text
     const safetyId = setTimeout(() => {
-      setLabelTexts(ORBIT_LABELS.map((l) => l.label));
+      setTitleTexts(ORBIT_LABELS.map((l) => l.title));
+      setSubtitleTexts(ORBIT_LABELS.map((l) => l.subtitle));
       setTyping([false, false, false]);
-    }, INTRO_MS + 100);
+    }, INTRO_MS + 2000);
     timeoutIdsRef.current.push(safetyId);
 
     return () => {
@@ -201,19 +256,50 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
           })}
         </svg>
 
-        {/* HTML text labels */}
-        {ORBIT_LABELS.map(({ label, mathDeg }, index) => {
+        {/* HTML text labels — title and subtitle each split on \n into block lines */}
+        {ORBIT_LABELS.map(({ mathDeg, title }, index) => {
           const { left, top, transform } = getLabelStyle(mathDeg);
-          const text        = labelTexts[index];
-          const isCursoring = typing[index];
+          const titleText    = titleTexts[index];
+          const subtitleText = subtitleTexts[index];
+          const isCursoring  = typing[index];
+          const cursorAfterTitle = isCursoring && subtitleText.length === 0;
+          // Split the currently-typed text on \n so each line renders as its
+          // own block-level span — handles multi-line title/subtitle like
+          // "YESHWANTRAO CHAVAN COLLEGE\nOF ENGINEERING" and "NAGPUR\n2023–27".
+          const titleLines    = titleText.split('\n');
+          const subtitleLines = subtitleText.split('\n');
+          const hasSubtitleContent = subtitleText.length > 0 || (isCursoring && !cursorAfterTitle);
           return (
             <div
-              key={label}
+              key={title}
               className={styles.orbitLabel}
               style={{ left, top, transform }}
             >
-              {text}
-              {isCursoring && <span className={styles.cursor}>|</span>}
+              {titleLines.map((line, lineIdx) => (
+                <span
+                  key={`title-${lineIdx}`}
+                  className={styles.orbitLabelTitle}
+                  style={{ display: 'block' }}
+                >
+                  {line}
+                  {cursorAfterTitle && lineIdx === titleLines.length - 1 && (
+                    <span className={styles.cursor}>|</span>
+                  )}
+                </span>
+              ))}
+              {hasSubtitleContent &&
+                subtitleLines.map((line, lineIdx) => (
+                  <span
+                    key={`subtitle-${lineIdx}`}
+                    className={styles.orbitLabelSubtitle}
+                    style={{ display: 'block' }}
+                  >
+                    {line}
+                    {isCursoring && !cursorAfterTitle && lineIdx === subtitleLines.length - 1 && (
+                      <span className={styles.cursor}>|</span>
+                    )}
+                  </span>
+                ))}
             </div>
           );
         })}
@@ -223,11 +309,11 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
       <div className={styles.identity}>
         <h1 className={styles.name}>Dishita Ghuge</h1>
         <p className={styles.tagline}>
-          Building intelligent systems at the intersection of ML and architecture
+          Applied ML, post-quantum security, and a bias for research that ships
         </p>
       </div>
 
-      {/* ③ Social links */}
+      {/* ③ Social links — label + northeast arrow, no badge */}
       <div className={styles.socialRow}>
         {socialLinks.map((link) => (
           <a
@@ -238,10 +324,24 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
             className={styles.socialLink}
             aria-label={link.platform}
           >
-            <span className={styles.badge}>{getBadge(link.platform)}</span>
             <span className={styles.socialLabel}>{link.platform}</span>
+            <span className={styles.socialArrow}>↗</span>
           </a>
         ))}
+
+        {/* Resume — handled separately since SocialLink's platform union
+            doesn't include "resume" */}
+        <a
+          key={resumeLink.platform}
+          href={resumeLink.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.socialLink}
+          aria-label={resumeLink.label}
+        >
+          <span className={styles.socialLabel}>{resumeLink.label}</span>
+          <span className={styles.socialArrow}>↗</span>
+        </a>
       </div>
 
     </div>
