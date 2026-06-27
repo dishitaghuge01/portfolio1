@@ -118,10 +118,11 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
   const timeoutIdsRef  = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    // ── Reset ────────────────────────────────────────────────────────────
+    // Always reset state — needed on every mount including StrictMode remounts
     setTitleTexts(['', '', '']);
     setSubtitleTexts(['', '', '']);
     setTyping([false, false, false]);
+
     setAnimCycle((c) => c + 1);
 
     intervalIdsRef.current.forEach(clearInterval);
