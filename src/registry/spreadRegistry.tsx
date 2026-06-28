@@ -10,9 +10,10 @@ import AchievementsPage from '../components/spreads/AchievementsPage';
 
 // ── Zero-prop wrappers ────────────────────────────────────────────────────────
 // Registry components must be zero-prop React.ComponentType.
-// Spread1Left's animationKey is driven by remounting the parent BookPage (key prop),
-// so the default value of 0 is fine here — the useEffect re-fires on remount.
-const Spread1LeftWrapper: React.FC = () => <Spread1Left animationKey={0} />;
+// Spread1Left takes no props at all — its intro animation runs once per
+// mount, naturally, and Book.tsx remounts it via a changing `key` whenever
+// the user returns to spread 1.
+const Spread1LeftWrapper: React.FC = () => <Spread1Left />;
 
 // ProjectPage wrappers — one per project slot
 const Project0: React.FC = () => <ProjectPage projectIndex={0} />;

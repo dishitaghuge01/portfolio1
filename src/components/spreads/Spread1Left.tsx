@@ -100,25 +100,24 @@ const PersonPlaceholder: React.FC = () => (
   </svg>
 );
 
-// ── Props ─────────────────────────────────────────────────────────────────────
-interface Spread1LeftProps {
-  animationKey?: number;
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
-const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
+// No props — the animation runs once per mount, naturally. The parent
+// (Book.tsx) is responsible for remounting this component via a changing
+// `key` whenever the user returns to spread 1, which is what re-triggers
+// the animation. No animationKey prop needed.
+const Spread1Left: React.FC = () => {
   // Each label now types its title (possibly multi-line) and subtitle.
   const [titleTexts, setTitleTexts]       = useState<string[]>(['', '', '']);
   const [subtitleTexts, setSubtitleTexts] = useState<string[]>(['', '', '']);
   const [typing, setTyping]               = useState<boolean[]>([false, false, false]);
-  // Bumped on each animationKey change to force CSS ring-draw restart via React key
+  // Bumped once on mount to force the CSS ring-draw animation to (re)start
   const [animCycle, setAnimCycle]         = useState(0);
 
   const intervalIdsRef = useRef<ReturnType<typeof setInterval>[]>([]);
   const timeoutIdsRef  = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    // Always reset state — needed on every mount including StrictMode remounts
+    // Always reset state on mount
     setTitleTexts(['', '', '']);
     setSubtitleTexts(['', '', '']);
     setTyping([false, false, false]);
@@ -203,8 +202,7 @@ const Spread1Left: React.FC<Spread1LeftProps> = ({ animationKey = 0 }) => {
       timeoutIdsRef.current.forEach(clearTimeout);
       timeoutIdsRef.current = [];
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animationKey]);
+  }, []);
 
   return (
     <div className={styles.page}>

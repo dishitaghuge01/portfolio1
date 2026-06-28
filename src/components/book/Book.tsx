@@ -27,17 +27,6 @@ const Book: React.FC = () => {
     flipDirection,
   } = useBook();
 
-  // Track how many times spread 1 is entered.
-  const spread1VisitCount = useRef(0);
-  const prevSpreadRef     = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (currentSpread === 1 && prevSpreadRef.current !== null && prevSpreadRef.current !== 1) {
-      spread1VisitCount.current += 1;
-    }
-    prevSpreadRef.current = currentSpread;
-  }, [currentSpread]);
-
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -199,14 +188,13 @@ const Book: React.FC = () => {
         {/* Physical book */}
         <div ref={bookRef} className={styles.book}>
 
-          {/* Left page — keys stay stable through the whole flip; they only
-              change once currentSpread itself updates at 600ms */}
+          {/* Left page — key only changes when currentSpread changes (600ms
+              after a flip completes), which remounts this BookPage exactly
+              once per return visit, at the right time. That remount is what
+              naturally re-triggers Spread1Left's intro animation on mount —
+              no animationKey prop or visit-count tracking needed. */}
           <BookPage
-            key={
-              currentSpread === 1
-                ? `spread1-${spread1VisitCount.current}`
-                : `left-${currentSpread}`
-            }
+            key={`left-${currentSpread}`}
             side="left"
             isFlipping={isFlipping}
             flipDirection={flipDirection}
