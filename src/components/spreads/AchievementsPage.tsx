@@ -3,6 +3,11 @@ import GlassCard from '../../components/ui/GlassCard';
 import { achievements } from '../../data/profile';
 import styles from './AchievementsPage.module.css';
 
+interface AchievementItem {
+  title: string;
+  subtitle: string;
+}
+
 const AchievementsPage: React.FC = () => (
   <div className={styles.page}>
 
@@ -14,10 +19,19 @@ const AchievementsPage: React.FC = () => (
 
     {/* Achievements list */}
     <div className={styles.list}>
-      {achievements.map((item) => (
+      {achievements.map((item: AchievementItem) => (
         <GlassCard key={item.title} padding="sm" hoverable>
           <div className={styles.cardInner}>
-            <div className={styles.iconCircle}>{item.icon}</div>
+            <div
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'var(--accent-primary)',
+                flexShrink: 0,
+                marginTop: '6px',
+              }}
+            />
             <div className={styles.textBlock}>
               <p className={styles.achievementTitle}>{item.title}</p>
               <p className={styles.achievementSubtitle}>{item.subtitle}</p>

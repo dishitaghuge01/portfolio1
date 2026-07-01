@@ -62,9 +62,32 @@ export const experience = [
   }
 ];
 export const achievements = [
-  { icon: "⬡", title: "Smart India Hackathon 2025", subtitle: "Finalist — DNABERT, UMAP & HDBSCAN" },
-  { icon: "✦", title: "High Recommendation", subtitle: "Order of Zenith — Maharashtra Legislative Assembly" },
-  { icon: "◈", title: "Special Mention", subtitle: "YCCExMUN — AIPPM Committee" },
-  { icon: "◉", title: "Goethe Zertifikat A1", subtitle: "German Language · 81%" },
-  { icon: "⬢", title: "Joint Treasurer", subtitle: "C.O.S.M.O.S. CSE Dept · 2025–26" },
-];
+  {
+    title: "L&T CreaTech 2026 Winner",
+    subtitle: "AI-driven Generative Design & Autonomous Construction"
+  },
+  {
+    title: "Smart India Hackathon 2025",
+    subtitle: "National Finalist · AI-powered eDNA Taxonomy System"
+  },
+  {
+    title: "Qualified GATE 2026",
+    subtitle: "Score: 37.64/100"
+  },
+  {
+    title: "Working President",
+    subtitle: "C.O.S.M.O.S., CSE Department"
+  },
+  {
+    title: "High Recommendation",
+    subtitle: "Order of Zenith · Maharashtra Legislative Assembly"
+  },
+  {
+    title: "Special Mention",
+    subtitle: "YCCExMUN · AIPPM Committee"
+  },
+  {
+    title: "Goethe Zertifikat A1",
+    subtitle: "German Language · 81%"
+  }
+]
