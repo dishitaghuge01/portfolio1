@@ -20,6 +20,7 @@ const getEntry = (totalSpreads: number, spreadIndex: number): RegistryEntry => {
 const Book: React.FC = () => {
   const {
     currentSpread,
+    targetSpread,
     totalSpreads,
     nextSpread,
     prevSpread,
@@ -155,7 +156,7 @@ const Book: React.FC = () => {
       clearTimeout(midpointTimerRef.current);
     }
 
-    const nextSpreadIndex = flipDirection === 'forward' ? currentSpread + 1 : currentSpread - 1;
+    const nextSpreadIndex = targetSpread;
     const nextEntry = getEntry(totalSpreads, nextSpreadIndex);
 
     midpointTimerRef.current = setTimeout(() => {
@@ -174,7 +175,7 @@ const Book: React.FC = () => {
         midpointTimerRef.current = null;
       }
     };
-  }, [isFlipping, flipDirection, currentSpread, totalSpreads]);
+  }, [isFlipping, flipDirection, currentSpread, targetSpread, totalSpreads]);
 
   const DisplayLeftComponent  = leftContent;
   const DisplayRightComponent = rightContent;

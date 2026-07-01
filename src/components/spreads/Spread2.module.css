@@ -13,7 +13,6 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  gap: 0; /* dividers handled per-row */
 }
 
 /* ── Left page — top block ───────────────────────────────────────────────────── */
@@ -68,81 +67,52 @@
 }
 
 /* ── Right page — ToC rows ───────────────────────────────────────────────────── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
 .entry {
+  width: 100%;
+}
+
+.cardInner {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  cursor: pointer;
-  background: transparent;
-  border-left: 2px solid transparent;
-  border-bottom: 1px solid var(--glass-border);
-  transition:
-    background 0.2s ease,
-    border-left-color 0.2s ease;
-  box-sizing: border-box;
+  gap: 12px;
+  align-items: flex-start;
 }
 
-.entry:last-child {
-  border-bottom: none;
-}
-
-.entry:hover {
-  background: var(--glass-bg-hover);
-  border-left-color: var(--accent-primary);
-}
-
-/* Icon circle */
-.iconCircle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-/* Text column */
-.entryText {
+.textBlock {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  flex: 1;
-  min-width: 0;
 }
 
-.entryTitle {
-  font-family: 'Instrument Serif', serif;
-  font-size: 30px;
-  font-weight: 400;
-  color: var(--text-primary);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.entrySubtitle {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 18px;
-  color: var(--text-muted);
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Page number */
-.pageNumber {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 18px;
-  color: var(--text-muted);
-  margin-left: auto;
+.bulletDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary);
   flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.achievementTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.achievementSubtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
 }

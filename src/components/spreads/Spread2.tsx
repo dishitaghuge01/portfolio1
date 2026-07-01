@@ -1,4 +1,5 @@
 import React from 'react';
+import GlassCard from '../../components/ui/GlassCard';
 import { spreadsMeta } from '../../data/spreads';
 import { projects } from '../../data/projects';
 import { useBook } from '../../contexts/BookContext';
@@ -12,37 +13,28 @@ const SPREAD_SUBTITLES: Record<number, string> = {
 
 // ── Reusable row ──────────────────────────────────────────────────────────────
 interface RowProps {
-  rowKey:    string | number;
-  icon:      React.ReactNode;
-  title:     string;
-  subtitle:  string;
-  pageNum:   number;
+  rowKey: string | number;
+  title: string;
+  subtitle: string;
   onActivate: () => void;
-  ariaLabel: string;
 }
 
-const TocRow: React.FC<RowProps> = ({ rowKey, icon, title, subtitle, pageNum, onActivate, ariaLabel }) => (
-  <div
+const TocRow: React.FC<RowProps> = ({ rowKey, title, subtitle, onActivate }) => (
+  <GlassCard
     key={rowKey}
     className={styles.entry}
+    padding="sm"
+    hoverable
     onClick={onActivate}
-    role="button"
-    tabIndex={0}
-    aria-label={ariaLabel}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onActivate();
-      }
-    }}
   >
-    <div className={styles.iconCircle}>{icon}</div>
-    <div className={styles.entryText}>
-      <span className={styles.entryTitle}>{title}</span>
-      <span className={styles.entrySubtitle}>{subtitle}</span>
+    <div className={styles.cardInner}>
+      <div className={styles.bulletDot} aria-hidden="true" />
+      <div className={styles.textBlock}>
+        <p className={styles.achievementTitle}>{title}</p>
+        <p className={styles.achievementSubtitle}>{subtitle}</p>
+      </div>
     </div>
-    <span className={styles.pageNumber}>{pageNum}</span>
-  </div>
+  </GlassCard>
 );
 
 // ── Left page ─────────────────────────────────────────────────────────────────
@@ -76,37 +68,32 @@ export const Spread2Right: React.FC = () => {
 
   return (
     <div className={styles.rightPage}>
-      {/* Project rows — one per project */}
-      {projects.map((project) => {
-        const techSubtitle = project.techStack.slice(0, 3).join(' · ');
-        const initial      = project.title.charAt(0).toUpperCase();
-        return (
-          <TocRow
-            key={project.title}
-            rowKey={project.title}
-            icon={initial}
-            title={project.title}
-            subtitle={techSubtitle}
-            pageNum={project.spreadIndex}
-            onActivate={() => goToSpread(project.spreadIndex)}
-            ariaLabel={`Go to spread ${project.spreadIndex}: ${project.title}`}
-          />
-        );
-      })}
+      <div className={styles.list}>
+        {/* Project rows — one per project */}
+        {projects.map((project) => {
+          const techSubtitle = project.techStack.slice(0, 3).join(' · ');
+          return (
+            <TocRow
+              key={project.title}
+              rowKey={project.title}
+              title={project.title}
+              subtitle={techSubtitle}
+              onActivate={() => goToSpread(project.spreadIndex)}
+            />
+          );
+        })}
 
-      {/* Non-project spread entries (Research, Closing, etc.) */}
-      {metaEntries.map((entry) => (
-        <TocRow
-          key={entry.index}
-          rowKey={entry.index}
-          icon={entry.icon}
-          title={entry.title}
-          subtitle={SPREAD_SUBTITLES[entry.index] ?? entry.subtitle ?? ''}
-          pageNum={entry.index}
-          onActivate={() => goToSpread(entry.index)}
-          ariaLabel={`Go to spread ${entry.index}: ${entry.title}`}
-        />
-      ))}
+        {/* Non-project spread entries (Research, Closing, etc.) */}
+        {metaEntries.map((entry) => (
+          <TocRow
+            key={entry.index}
+            rowKey={entry.index}
+            title={entry.title}
+            subtitle={SPREAD_SUBTITLES[entry.index] ?? entry.subtitle ?? ''}
+            onActivate={() => goToSpread(entry.index)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

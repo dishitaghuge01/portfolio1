@@ -13,6 +13,7 @@ type FlipDirection = 'forward' | 'backward';
 
 interface BookContextValue {
   currentSpread: number;
+  targetSpread: number;
   totalSpreads: number;
   isFlipping: boolean;
   flipDirection: FlipDirection;
@@ -39,6 +40,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
   totalSpreads,
 }) => {
   const [currentSpread, setCurrentSpread] = useState(1);
+  const [targetSpread, setTargetSpread] = useState(1);
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState<FlipDirection>('forward');
 
@@ -55,6 +57,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
 
       const direction: FlipDirection = n > currentSpread ? 'forward' : 'backward';
       setFlipDirection(direction);
+      setTargetSpread(n);
       setIsFlipping(true);
 
       // Clear any stale timer (safety net)
@@ -82,6 +85,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
   const value = useMemo<BookContextValue>(
     () => ({
       currentSpread,
+      targetSpread,
       totalSpreads,
       isFlipping,
       flipDirection,
@@ -91,6 +95,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
     }),
     [
       currentSpread,
+      targetSpread,
       totalSpreads,
       isFlipping,
       flipDirection,
