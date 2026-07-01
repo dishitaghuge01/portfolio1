@@ -19,7 +19,7 @@ export const projects: Project[] = [
       'Built 4 independent FastAPI microservices (Signing Authority, HSM Simulator, Ticket Issuer, Verifier) with a CLI driving the full ticket lifecycle',
       'Engineered a binary wire format with a 3-byte magic header to pack PQC signatures within DataMatrix capacity constraints',
       'Wrote 32 unit tests covering signature generation, verification, tamper detection, and encoding edge cases',
-      'It is a upgrade to Railway-Auth #https://github.com/dishitaghuge01/railway-auth-demo',
+      'It is an upgrade to Railway-Auth <a href="https://github.com/dishitaghuge01/railway-auth-demo" target="_blank" rel="noreferrer">GitHub repo</a>',
     ],
     techStack: ['Python', 'FastAPI', 'Falcon-512', 'liboqs', 'DataMatrix', 'pytest'],
     liveLink: '#',

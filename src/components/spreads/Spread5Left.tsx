@@ -3,14 +3,13 @@ import { papers } from '../../data/publications';
 import type { ResearchPaper } from '../../data/publications';
 import styles from './Spread5Left.module.css';
 
-const FOCUS_AREAS = [
-  'Latent Space Analysis',
-  'Spatial AI',
-  'Legal NLP',
-  'Graph Embeddings',
-  'Post-Quantum Security',
-  'Generative Models',
-  'Applied Computer Vision',
+const skillGroups = [
+  { label: 'AI/ML & NLP', items: ['spaCy', 'LangChain', 'Whisper', 'OCR', 'RAG', 'Anaconda'] },
+  { label: 'Web & Backend', items: ['FastAPI', 'Node.js', 'Express', 'React', 'Next.js'] },
+  { label: 'Databases', items: ['PostgreSQL', 'ChromaDB', 'Neo4j'] },
+  { label: 'DevOps & Cloud', items: ['Docker', 'Kubernetes', 'CI/CD', 'Azure'] },
+  { label: 'Languages', items: ['Python', 'C', 'C++', 'Java', 'JavaScript'] },
+  { label: 'Tools', items: ['Doccano', 'Jupyter'] },
 ];
 
 // ── Single paper card ─────────────────────────────────────────────────────────
@@ -44,16 +43,7 @@ const PaperCard: React.FC<{ paper: ResearchPaper }> = ({ paper }) => {
       <p className={styles.tagsLine}>{paper.tags.join(' · ')}</p>
 
       {/* Size C — conditional footer */}
-      {isUnderReview ? (
-        <a
-          href={paper.link ?? '#'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.previewLink}
-        >
-          Preview Draft →
-        </a>
-      ) : (
+      {!isUnderReview && (
         <>
           <div className={styles.timelineTrack}>
             <div
@@ -87,12 +77,19 @@ const Spread5Left: React.FC = () => (
       ))}
     </div>
 
-    {/* Focus areas */}
+    {/* Skills & Tools */}
     <div>
-      <p className={styles.sectionLabel}>Focus Areas</p>
-      <div className={styles.chipRow}>
-        {FOCUS_AREAS.map((area) => (
-          <span key={area} className={styles.chip}>{area}</span>
+      <p className={styles.sectionLabel}>SKILLS &amp; TOOLS</p>
+      <div className={styles.skillGroups}>
+        {skillGroups.map((group) => (
+          <div key={group.label} className={styles.skillGroup}>
+            <span className={styles.skillGroupLabel}>{group.label}</span>
+            <div className={styles.skillGroupItems}>
+              {group.items.map((item) => (
+                <span key={item} className={styles.chip}>{item}</span>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>

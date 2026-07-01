@@ -38,19 +38,29 @@ export const education = [
 
 export const experience = [
   {
+    company: "Dept. of CSE, SVNIT Surat",
+    role: "Research Intern (under Dr. Balu Parne)",
+    location: "Surat, India",
+    duration: "May 2026 – July 2026",
+    bullets: [
+      "Designed a post-quantum ticket authentication architecture using Falcon-padded-512 (FIPS 206/FN-DSA) across four Python microservices, replacing ECDSA P-256 while keeping verification under 1% of ticket-processing latency.",
+      "Evaluated DataMatrix ECC200 capacity with libdmtx, showing ML-DSA-44 exceeds the 1556-byte limit and Falcon-padded-512 is the only NIST-track scheme suitable for offline barcode authentication.",
+      "Built an attack-defense model for fabrication, cloning, tampering, and impersonation, showing cloning requires audit-layer UUID deduplication beyond cryptographic verification.",
+      "Co-authored an IEEE paper showing post-quantum migration."
+    ]
+  },
+  {
     company: "63 Moons Technologies Ltd.",
     role: "Machine Learning Intern",
     location: "Mumbai, India",
     duration: "June–July 2025",
     bullets: [
-      "Built end-to-end Legal Entity Extraction pipeline using spaCy and Doccano, processing 1,000+ High Court judgments with 85% F1-score",
-      "Implemented LangChain RAG workflows with ChromaDB, improving LLM query response time by 30%",
-      "Contributed to speech-to-text pipeline using Whisper and Azure, processing 500+ audio files",
-      "Worked with FastAPI, PostgreSQL, Redis, Kafka, Docker, and Kubernetes",
-    ],
-  },
+      "Built a Legal Entity Extraction (NER) pipeline using spaCy and Doccano for 1,000+ High Court judgments, reducing manual processing by 70%.",
+      "Contributed to District Court APIs, Judicial Gateway, LegalGPT, and a Whisper + Azure speech-to-text pipeline processing 500+ legal audio files.",
+      "Implemented LangChain-based RAG pipelines with ChromaDB, improving LLM query response time by 30%."
+    ]
+  }
 ];
-
 export const achievements = [
   { icon: "⬡", title: "Smart India Hackathon 2025", subtitle: "Finalist — DNABERT, UMAP & HDBSCAN" },
   { icon: "✦", title: "High Recommendation", subtitle: "Order of Zenith — Maharashtra Legislative Assembly" },

@@ -65,51 +65,25 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectIndex }) => {
         {/* Row 2 — description */}
         <p className={styles.description}>{project.description}</p>
 
-        {/* Row 3 — bullets */}
+        {/* Row 3 — bullets (no scroll — clipped to available space via flex:1 + overflow:hidden) */}
         {project.bullets && project.bullets.length > 0 && (
-          <div
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              gap: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {project.bullets.map((bullet, index) => (
-              <div
-                key={index}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  gap: '8px',
-                  alignItems: 'flex-start',
-                }}
-              >
-                {/* Bullet dot */}
-                <div
-                  style={{
-                    width: '4px',
-                    height: '4px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--accent-primary)',
-                    flexShrink: 0,
-                    marginTop: '6px',
-                  }}
-                />
-                {/* Bullet text */}
-                <span
-                  style={{
-                    fontFamily: 'DM Sans, sans-serif',
-                    fontSize: '15px',
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.5',
-                  }}
-                >
-                  {bullet}
-                </span>
-              </div>
-            ))}
+          <div className={styles.bulletList}>
+            {project.bullets.map((bullet, index) => {
+              const hasAnchor = bullet.includes('<a');
+              return (
+                <div key={index} className={styles.bulletRow}>
+                  <div className={styles.bulletDot} />
+                  {hasAnchor ? (
+                    <span
+                      className={`${styles.bulletText} ${styles.bullet}`}
+                      dangerouslySetInnerHTML={{ __html: bullet }}
+                    />
+                  ) : (
+                    <span className={`${styles.bulletText} ${styles.bullet}`}>{bullet}</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
