@@ -24,6 +24,4 @@ export const spreadsMeta: SpreadMeta[] = [
   { index: 3, title: 'Projects I',          icon: '⬡',  subtitle: 'ArchiIntel · NeuralSearch'         },
   { index: 4, title: 'Projects II',         icon: '⬢',  subtitle: 'CloudStore · GraphMind'            },
   { index: 5, title: 'Research & Skills',   icon: '✦',  subtitle: 'Papers · Education · Achievements' },
-  { index: 6, title: 'Achievements',         icon: '✦',  subtitle: 'Leadership & Recognition'          },
-  { index: 7, title: 'Closing',              icon: '❋',  subtitle: ''                                  },
 ];

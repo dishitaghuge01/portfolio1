@@ -79,6 +79,6 @@ export const projects: Project[] = [
     liveLink: '#',
     githubLink: 'https://github.com/dishitaghuge01/high-court-ner-pipeline',
     imagePlaceholder: '#1a1a0d',
-    spreadIndex: 3,
+    spreadIndex: 4,
   },
 ];

@@ -1,7 +1,7 @@
 import React from 'react';
 import Spread1Left from '../components/spreads/Spread1Left';
 import EmbeddingSpace from '../components/spreads/EmbeddingSpace';
-import { Spread2Left, Spread2Right } from '../components/spreads/Spread2';
+import { Spread2ToC } from '../components/spreads/Spread2';
 import ProjectPage from '../components/spreads/ProjectPage';
 import Spread5Left from '../components/spreads/Spread5Left';
 import Spread5Right from '../components/spreads/Spread5Right';
@@ -32,14 +32,11 @@ const Project3: React.FC = () => <ProjectPage projectIndex={3} />;
 // 5. That's it — the book, ToC, and counter all update automatically.
 export const spreadRegistry: Record<
   number,
-  { left: React.ComponentType; right: React.ComponentType | null }
+  { left: React.ComponentType | null; right: React.ComponentType | null }
 > = {
-  // TEMP: testing EmbeddingSpace, revert to Spread1Right after review
   1: { left: Spread1LeftWrapper, right: EmbeddingSpace },
-  2: { left: Spread2Left,        right: Spread2Right   },
-  3: { left: Project0,           right: Project1       },
-  4: { left: Project2,           right: Project3       },
-  5: { left: Spread5Left,       right: Spread5Right   },
-  6: { left: AchievementsPage,  right: Spread6Left    },
-  7: { left: null,              right: null           },
+  2: { left: Spread2ToC,         right: Spread5Right },
+  3: { left: Project0,           right: Project1 },
+  4: { left: Project2,           right: Project3 },
+  5: { left: Spread5Left,        right: AchievementsPage },
 };
