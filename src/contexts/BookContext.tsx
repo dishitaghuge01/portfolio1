@@ -77,8 +77,11 @@ export const BookProvider: React.FC<BookProviderProps> = ({
       if (n < 1 || n > totalSpreads) return;
 
       const direction: FlipDirection = n > currentSpread ? 'forward' : 'backward';
+      const correspondingLeftPage = (n - 1) * 2 + 1;
+
       setFlipDirection(direction);
       setTargetSpread(n);
+      setTargetPage(correspondingLeftPage);
       setIsFlipping(true);
 
       // Clear any stale timer (safety net)
@@ -88,6 +91,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
 
       flipTimerRef.current = setTimeout(() => {
         setCurrentSpread(n);
+        setCurrentPage(correspondingLeftPage);
         setIsFlipping(false);
         flipTimerRef.current = null;
       }, FLIP_DURATION_MS);
@@ -111,8 +115,11 @@ export const BookProvider: React.FC<BookProviderProps> = ({
       if (n < 1 || n > totalPages) return;
 
       const direction: FlipDirection = n > currentPage ? 'forward' : 'backward';
+      const correspondingSpread = Math.ceil(n / 2);
+
       setFlipDirection(direction);
       setTargetPage(n);
+      setTargetSpread(correspondingSpread);
       setIsFlipping(true);
 
       // Clear any stale timer (safety net)
@@ -122,6 +129,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
 
       flipTimerRef.current = setTimeout(() => {
         setCurrentPage(n);
+        setCurrentSpread(correspondingSpread);
         setIsFlipping(false);
         flipTimerRef.current = null;
       }, FLIP_DURATION_MS);
