@@ -9,6 +9,7 @@ interface BookPageProps {
   children?: React.ReactNode;
   isFlipping?: boolean;
   flipDirection?: FlipDirection;
+  className?: string;
 }
 
 const BookPage: React.FC<BookPageProps> = ({
@@ -16,6 +17,7 @@ const BookPage: React.FC<BookPageProps> = ({
   children,
   isFlipping = false,
   flipDirection,
+  className,
 }) => {
   const [animationReady, setAnimationReady] = useState(false);
 
@@ -42,6 +44,7 @@ const BookPage: React.FC<BookPageProps> = ({
     isIncoming && animationReady && flipDirection === 'forward'  ? styles.flipInForward   : '',
     isOutgoing && flipDirection === 'backward'              ? styles.flipOutBackward : '',
     isIncoming && animationReady && flipDirection === 'backward' ? styles.flipInBackward  : '',
+    className ?? '',
   ]
     .filter(Boolean)
     .join(' ');

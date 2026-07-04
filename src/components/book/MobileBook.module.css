@@ -1,0 +1,95 @@
+/* ── Viewport scene ─────────────────────────────────────────────────────────── */
+.mobileScene {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-base);
+  perspective: 2000px;
+  transition: background 0.4s ease;
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+/* ── Single physical page ──────────────────────────────────────────────────── */
+.mobilePage {
+  position: relative;
+  width: 100%;
+  height: 88vh;
+  background: var(--bg-surface);
+  border-radius: 12px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  outline: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07),
+    0 10px 30px rgba(0, 0, 0, 0.8),
+    0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Ambient radial glow, centered since there's no left/right split on mobile */
+.mobilePage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse 70% 70% at 50% 50%, var(--accent-glow), transparent 70%);
+}
+
+/* Overrides BookPage's default 50% width / asymmetric border-radius so a
+   single page fills the whole mobile viewport cleanly. */
+.fullWidthPage {
+  width: 100% !important;
+  border-radius: 12px !important;
+  border-right: none !important;
+}
+
+/* ── Click zones — thin edge strips, content never blocked ────────────────── */
+.clickZone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 40px;
+  z-index: 30;
+  background: transparent;
+}
+
+.clickZoneLeft {
+  left: 0;
+}
+
+.clickZoneRight {
+  right: 0;
+}
+
+.zoneDisabled {
+  pointer-events: none;
+}
+
+/* ── Placeholder content ────────────────────────────────────────────────────── */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 10px;
+  opacity: 0.15;
+  user-select: none;
+  pointer-events: none;
+}
+
+.placeholderIcon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.placeholderLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+}
