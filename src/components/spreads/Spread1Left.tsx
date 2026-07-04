@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import GlassCircle from '../../components/ui/GlassCircle';
 import { socialLinks } from '../../data/profile';
 import resumePdf from '../../assets/resume.pdf';
+import dishitaPhoto from '../../assets/Dishita.jpeg'
 import styles from './Spread1Left.module.css';
 
 // ── Geometry constants ────────────────────────────────────────────────────────
@@ -212,7 +213,7 @@ const Spread1Left: React.FC = () => {
 
         {/* Photo frame — absolutely centered */}
         <div className={styles.circleAnchor}>
-          <GlassCircle size={420} placeholderColor="#1a2a3a" imageSrc="/src/assets/Dishita.jpeg">
+          <GlassCircle size={420} placeholderColor="#1a2a3a" imageSrc={dishitaPhoto}>
             <PersonPlaceholder />
           </GlassCircle>
         </div>
