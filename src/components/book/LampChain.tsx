@@ -31,13 +31,10 @@ const BeadUnit: React.FC<{ index: number }> = ({ index }) => {
   );
 };
 
-const LampChain: React.FC<LampChainProps> = ({ theme, onToggle }) => {
+const LampChain: React.FC<LampChainProps> = ({ onToggle }) => {
   const [anim, setAnim]   = useState<AnimState>('rest');
   const [hovered, setHov] = useState(false);
   const timerRef          = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // isDark derived internally from the theme prop, per the existing contract
-  const isDark = theme === 'dark';
 
   const handleClick = useCallback(() => {
     if (anim !== 'rest') return;

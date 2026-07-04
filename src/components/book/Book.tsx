@@ -10,8 +10,7 @@ import styles from './Book.module.css';
 const WHEEL_COOLDOWN_MS = 800;
 const MIDPOINT_MS = 300;
 
-type RegistryEntry = { left: React.ComponentType; right: React.ComponentType | null } | null;
-
+type RegistryEntry = { left: React.ComponentType | null; right: React.ComponentType | null } | null;
 const getEntry = (totalSpreads: number, spreadIndex: number): RegistryEntry => {
   if (spreadIndex < 1 || spreadIndex > totalSpreads) return null;
   return spreadRegistry[spreadIndex] ?? null;

@@ -13,6 +13,8 @@ const CLUSTER_COLOR: Record<Cluster, string> = {
   backend:  'var(--cluster-backend)',
   data:     'var(--cluster-data)',
   research: 'var(--cluster-research)',
+  crypto:   'var(--cluster-crypto)',
+  nlp:      'var(--cluster-nlp)',
 };
 
 /* ── Cluster label positions and display names ───────────────────────────────── */
@@ -22,6 +24,8 @@ const CLUSTER_LABELS: { cluster: Cluster; label: string; x: number; y: number }[
   { cluster: 'backend',  label: 'BACKEND',  x: 78, y: 58 },
   { cluster: 'data',     label: 'DATA',     x: 38, y: 88 },
   { cluster: 'research', label: 'RESEARCH', x: 50, y: 38 },
+  { cluster: 'crypto',   label: 'CRYPTO',   x: 82, y: 62 },
+  { cluster: 'nlp',      label: 'NLP',      x: 18, y: 72 },
 ];
 
 /* ── Component ───────────────────────────────────────────────────────────────── */

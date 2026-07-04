@@ -44,7 +44,7 @@ const Spread3Right: React.FC = () => {
         <p className={styles.techLabel}>Tech Stack</p>
         <div className={styles.chipRow}>
           {project.techStack.map((tech) => (
-            <TechChip key={tech.name} name={tech.name} />
+            <TechChip key={tech} name={tech} />
           ))}
         </div>
       </div>

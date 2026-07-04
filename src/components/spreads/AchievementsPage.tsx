@@ -5,7 +5,7 @@ import styles from './AchievementsPage.module.css';
 
 interface AchievementItem {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }
 
 const AchievementsPage: React.FC = () => (
@@ -34,7 +34,9 @@ const AchievementsPage: React.FC = () => (
             />
             <div className={styles.textBlock}>
               <p className={styles.achievementTitle}>{item.title}</p>
-              <p className={styles.achievementSubtitle}>{item.subtitle}</p>
+              {item.subtitle && (
+                <p className={styles.achievementSubtitle}>{item.subtitle}</p>
+              )}
             </div>
           </div>
         </GlassCard>

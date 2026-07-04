@@ -5,7 +5,6 @@ import { Spread2ToC } from '../components/spreads/Spread2';
 import ProjectPage from '../components/spreads/ProjectPage';
 import Spread5Left from '../components/spreads/Spread5Left';
 import Spread5Right from '../components/spreads/Spread5Right';
-import Spread6Left from '../components/spreads/Spread6Left';
 import AchievementsPage from '../components/spreads/AchievementsPage';
 
 // ── Zero-prop wrappers ────────────────────────────────────────────────────────
