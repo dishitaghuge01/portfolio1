@@ -154,47 +154,47 @@
 /* ── Mobile compaction ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
   .page {
-    gap: 12px;
+    gap: 8px;
   }
 
   .papersList {
-    gap: 10px;
+    gap: 6px;
   }
 
   .paperCard {
-    padding: 10px 12px;
+    padding: 7px 9px;
   }
 
   .statusWord {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .paperTitle {
-    font-size: 14px;
-    margin: 5px 0;
+    font-size: 12.5px;
+    margin: 3px 0;
   }
 
   .bodyText, .tagsLine, .timelineMeta {
-    font-size: 12px;
-    margin: 0 0 6px 0;
+    font-size: 11px;
+    margin: 0 0 4px 0;
   }
 
   .skillGroups {
-    grid-template-columns: 90px 1fr;
-    gap: 4px 6px;
+    grid-template-columns: 76px 1fr;
+    gap: 3px 5px;
   }
 
   .skillGroupLabel {
-    width: 90px;
-    font-size: 10px;
+    width: 76px;
+    font-size: 9px;
   }
 
   .skillGroupItems {
-    gap: 5px;
+    gap: 4px;
   }
 
   .chip {
-    padding: 2px 8px;
-    font-size: 10px;
+    padding: 1px 6px;
+    font-size: 9px;
   }
 }

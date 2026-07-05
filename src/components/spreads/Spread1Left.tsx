@@ -333,7 +333,7 @@ const Spread1Left: React.FC = () => {
             aria-label={link.platform}
           >
             <span className={styles.socialLabel}>{link.platform}</span>
-            <span className={styles.socialArrow}>↗</span>
+            <span className={styles.socialArrow}><ExternalLinkArrow /></span>
           </a>
         ))}
 

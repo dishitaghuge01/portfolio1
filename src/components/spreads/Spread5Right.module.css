@@ -179,38 +179,38 @@
 /* ── Mobile compaction ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
   .page {
-    gap: 14px;
+    gap: 10px;
   }
 
   .eduCard, .expCard {
-    padding: 12px;
+    padding: 8px;
   }
 
   .cgpaNumber {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .vDivider {
-    height: 36px;
+    height: 28px;
   }
 
   .eduInstitution, .expCompany {
-    font-size: 14px;
+    font-size: 12.5px;
   }
 
   .eduDegree, .eduMinor, .eduMeta, .expRole, .expMeta, .bulletText {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .expList {
-    gap: 8px;
+    gap: 5px;
   }
 
   .bulletList {
-    gap: 4px;
+    gap: 2px;
   }
 
   .expMeta {
-    margin: 0 0 6px 0;
+    margin: 0 0 3px 0;
   }
 }

@@ -129,43 +129,43 @@
 /* ── Mobile compaction ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
   .page {
-    gap: 14px;
+    gap: 10px;
   }
 
   .header {
-    gap: 5px;
+    gap: 4px;
   }
 
   .list {
-    gap: 7px;
+    gap: 5px;
   }
 
   .iconCircle {
-    width: 26px;
-    height: 26px;
-    font-size: 14px;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
   }
 
   .achievementTitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .achievementSubtitle {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .closingBlock {
+    gap: 6px;
+    padding-top: 2px;
+  }
+
+  .closingText {
     font-size: 12px;
     line-height: 1.35;
   }
 
-  .closingBlock {
-    gap: 10px;
-    padding-top: 4px;
-  }
-
-  .closingText {
-    font-size: 13px;
-    line-height: 1.45;
-  }
-
   .closingLinks {
-    gap: 14px;
+    gap: 10px;
   }
 }
