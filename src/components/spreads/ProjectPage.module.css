@@ -204,9 +204,66 @@
 }
 
 /* Row 4 — chips */
+/* Row 4 — chips */
 .chipRow {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 4px;
+}
+
+/* ── Mobile compaction ─────────────────────────────────────────────────────── */
+/* The media zone at 52% left too little room below for title + description +
+   chips on a single small screen — shrink it substantially and tighten every
+   spacing/font value in the detail zone so everything fits without scrolling. */
+@media (max-width: 767px) {
+  .mediaZone {
+    flex: 0 0 34%;
+  }
+
+  .mediaIcon {
+    font-size: 40px;
+  }
+
+  .mediaWatermark {
+    font-size: 48px;
+  }
+
+  .cornerPill {
+    padding: 5px 11px;
+    font-size: 12px;
+  }
+
+  .detailZone {
+    padding: 12px;
+    gap: 5px;
+  }
+
+  .numberBadge {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .projectTitle {
+    font-size: 19px;
+  }
+
+  .description {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .bulletList {
+    gap: 3px;
+  }
+
+  .bulletText {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .chipRow {
+    gap: 3px;
+  }
 }

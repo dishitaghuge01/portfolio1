@@ -175,3 +175,42 @@
   line-height: 1.5;
   margin: 0;
 }
+
+/* ── Mobile compaction ─────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .page {
+    gap: 14px;
+  }
+
+  .eduCard, .expCard {
+    padding: 12px;
+  }
+
+  .cgpaNumber {
+    font-size: 20px;
+  }
+
+  .vDivider {
+    height: 36px;
+  }
+
+  .eduInstitution, .expCompany {
+    font-size: 14px;
+  }
+
+  .eduDegree, .eduMinor, .eduMeta, .expRole, .expMeta, .bulletText {
+    font-size: 12px;
+  }
+
+  .expList {
+    gap: 8px;
+  }
+
+  .bulletList {
+    gap: 4px;
+  }
+
+  .expMeta {
+    margin: 0 0 6px 0;
+  }
+}

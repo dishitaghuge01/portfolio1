@@ -150,3 +150,41 @@
   border: none;
   margin: 0;
 }
+
+/* ── Mobile compaction ─────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .topBlock {
+    gap: 12px;
+  }
+
+  .heading {
+    font-size: 42px;
+  }
+
+  .description {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .list {
+    gap: 6px;
+  }
+
+  .tocHeader {
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .tocTitle {
+    font-size: 22px;
+  }
+
+  .achievementTitle {
+    font-size: 14px;
+  }
+
+  .achievementSubtitle {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+}

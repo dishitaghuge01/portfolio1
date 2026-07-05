@@ -4,6 +4,8 @@ import { socialLinks } from '../../data/profile';
 import resumePdf from '../../assets/resume.pdf';
 import dishitaPhoto from '../../assets/Dishita.jpeg'
 import styles from './Spread1Left.module.css';
+import ExternalLinkArrow from '../../components/ui/ExternalLinkArrow';
+
 
 // ── Geometry constants ────────────────────────────────────────────────────────
 const CX       = 260;                      // wrapper/SVG center x
@@ -346,7 +348,7 @@ const Spread1Left: React.FC = () => {
           aria-label={resumeLink.label}
         >
           <span className={styles.socialLabel}>{resumeLink.label}</span>
-          <span className={styles.socialArrow}>↗</span>
+          <span className={styles.socialArrow}><ExternalLinkArrow /></span>
         </a>
       </div>
 

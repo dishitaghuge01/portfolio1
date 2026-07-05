@@ -17,5 +17,13 @@
   white-space: nowrap;
 
   /* Prevent unwanted user-select on click */
+  /* Prevent unwanted user-select on click */
   user-select: none;
+}
+
+@media (max-width: 767px) {
+  .chip {
+    padding: 3px 9px;
+    font-size: 11.5px;
+  }
 }

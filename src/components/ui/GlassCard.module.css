@@ -19,6 +19,11 @@
 .padding-md   { padding: 20px 24px; }
 .padding-lg   { padding: 32px 36px; }
 
+@media (max-width: 767px) {
+  .padding-sm { padding: 8px 12px; }
+  .padding-md { padding: 14px 16px; }
+  .padding-lg { padding: 20px 22px; }
+}
 /* Hoverable */
 .hoverable {
   cursor: pointer;
