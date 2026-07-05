@@ -218,52 +218,52 @@
    spacing/font value in the detail zone so everything fits without scrolling. */
 @media (max-width: 767px) {
   .mediaZone {
-    flex: 0 0 26%;
+    flex: 0 0 30%;
   }
 
   .mediaIcon {
-    font-size: 30px;
+    font-size: 35px;
   }
 
   .mediaWatermark {
-    font-size: 36px;
+    font-size: 42px;
   }
 
   .cornerPill {
-    padding: 4px 9px;
-    font-size: 11px;
+    padding: 4.5px 10px;
+    font-size: 11.5px;
   }
 
   .detailZone {
-    padding: 10px;
-    gap: 3px;
+    padding: 11px;
+    gap: 4px;
   }
 
   .numberBadge {
-    width: 16px;
-    height: 16px;
-    font-size: 9px;
+    width: 17px;
+    height: 17px;
+    font-size: 9.5px;
   }
 
   .projectTitle {
-    font-size: 16px;
+    font-size: 17.5px;
   }
 
   .description {
-    font-size: 11px;
-    line-height: 1.25;
+    font-size: 12px;
+    line-height: 1.3;
   }
 
   .bulletList {
-    gap: 2px;
+    gap: 3px;
   }
 
   .bulletText {
-    font-size: 11px;
-    line-height: 1.25;
+    font-size: 12px;
+    line-height: 1.3;
   }
 
   .chipRow {
-    gap: 2px;
+    gap: 3px;
   }
 }
