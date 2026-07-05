@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import styles from './LampChain.module.css';
 
 type Theme = 'dark' | 'light';
@@ -9,7 +10,8 @@ interface LampChainProps {
   onToggle: () => void;
 }
 
-const BEADS = 20;
+const BEADS_DESKTOP = 20;
+const BEADS_MOBILE = 10; // shorter chain — 20 beads runs too tall on small screens
 const EXTRA_BEADS = 3; // additional links revealed from the mount during pull
 
 // Shared bead+segment unit — used identically for both the main chain
@@ -35,6 +37,8 @@ const LampChain: React.FC<LampChainProps> = ({ onToggle }) => {
   const [anim, setAnim]   = useState<AnimState>('rest');
   const [hovered, setHov] = useState(false);
   const timerRef          = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMobile          = useIsMobile();
+  const beadCount          = isMobile ? BEADS_MOBILE : BEADS_DESKTOP;
 
   const handleClick = useCallback(() => {
     if (anim !== 'rest') return;
@@ -105,8 +109,8 @@ const LampChain: React.FC<LampChainProps> = ({ onToggle }) => {
 
       {/* Chain body — the only element that moves; chain starts directly here */}
       <div className={chainBodyClasses}>
-        {/* Beaded chain — 20 segment+bead units */}
-        {Array.from({ length: BEADS }, (_, i) => (
+        {/* Beaded chain — shorter on mobile so it doesn't run too tall */}
+        {Array.from({ length: beadCount }, (_, i) => (
           <BeadUnit key={i} index={i} />
         ))}
 

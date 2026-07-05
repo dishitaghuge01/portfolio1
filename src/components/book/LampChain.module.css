@@ -21,6 +21,14 @@
   filter: brightness(1.4) drop-shadow(0 0 7px var(--accent-glow));
 }
 
+/* On narrow screens, the chain sits closer to the edge — 52px was tuned for
+   the desktop book's margins and leaves an odd gap on mobile. */
+@media (max-width: 767px) {
+  .wrapper {
+    right: 8px;
+  }
+}
+
 /* ── Extra beads — real chain links revealed from the fixed mount during pull ── */
 /* Container clips to 0 at rest; grows to reveal 3 full bead+segment units as
    the chain pulls down, then retracts on snap — same beads as the main chain,
