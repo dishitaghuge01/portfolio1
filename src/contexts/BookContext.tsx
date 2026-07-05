@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-
+import { useIsMobile } from '../hooks/useIsMobile';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type FlipDirection = 'forward' | 'backward';
@@ -54,6 +54,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
   totalSpreads,
 }) => {
   const totalPages = totalSpreads * 2;
+  const isMobile = useIsMobile();
 
   const [currentSpread, setCurrentSpread] = useState(1);
   const [targetSpread, setTargetSpread] = useState(1);
@@ -78,7 +79,17 @@ export const BookProvider: React.FC<BookProviderProps> = ({
       const correspondingPage = side === 'left' ? (n - 1) * 2 + 1 : (n - 1) * 2 + 2;
 
       // Guard: already on the exact target page (same spread AND same side)
+      // Guard: already on the exact target page (same spread AND same side)
       if (correspondingPage === currentPage) return;
+
+      // Desktop shows both pages of a spread at once — if we're already on
+      // this spread, there's nothing to visually flip. Sync currentPage
+      // silently (keeps mobile page-tracking correct if the user later
+      // resizes across the breakpoint) without playing an animation.
+      if (n === currentSpread && !isMobile) {
+        setCurrentPage(correspondingPage);
+        return;
+      }
 
       const direction: FlipDirection = correspondingPage > currentPage ? 'forward' : 'backward';
 
@@ -99,7 +110,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
         flipTimerRef.current = null;
       }, FLIP_DURATION_MS);
     },
-    [currentPage, isFlipping, totalSpreads],
+    [currentPage, currentSpread, isFlipping, isMobile, totalSpreads],
   );
 
   const nextSpread = useCallback(() => {
