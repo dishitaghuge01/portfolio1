@@ -182,3 +182,39 @@
   opacity: 1;
   line-height: 1;
 }
+
+/* ── Mobile compaction (horizontal fit) ───────────────────────────────────── */
+@media (max-width: 767px) {
+  .identity {
+    margin-top: -6px;
+  }
+
+  .name {
+    font-size: 30px;
+    margin: 0 0 4px 0;
+  }
+
+  .tagline {
+    font-size: 12.5px;
+    max-width: 250px;
+    line-height: 1.4;
+  }
+
+  .socialRow {
+    gap: 6px;
+  }
+
+  .socialLink {
+    padding: 6px 12px;
+    gap: 4px;
+  }
+
+  .socialLabel {
+    font-size: 12.5px;
+  }
+
+  .socialArrow {
+    font-size: 9px;
+    margin-left: 3px;
+  }
+}
