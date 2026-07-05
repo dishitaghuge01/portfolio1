@@ -71,13 +71,16 @@ export const BookProvider: React.FC<BookProviderProps> = ({
 
   const goToSpread = useCallback(
     (n: number, side: PageSide = 'left') => {
-      // Guard: already animating, same page, or out of range
+      // Guard: already animating, or out of range
       if (isFlipping) return;
-      if (n === currentSpread) return;
       if (n < 1 || n > totalSpreads) return;
 
-      const direction: FlipDirection = n > currentSpread ? 'forward' : 'backward';
       const correspondingPage = side === 'left' ? (n - 1) * 2 + 1 : (n - 1) * 2 + 2;
+
+      // Guard: already on the exact target page (same spread AND same side)
+      if (correspondingPage === currentPage) return;
+
+      const direction: FlipDirection = correspondingPage > currentPage ? 'forward' : 'backward';
 
       setFlipDirection(direction);
       setTargetSpread(n);
@@ -96,7 +99,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
         flipTimerRef.current = null;
       }, FLIP_DURATION_MS);
     },
-    [currentSpread, isFlipping, totalSpreads],
+    [currentPage, isFlipping, totalSpreads],
   );
 
   const nextSpread = useCallback(() => {
