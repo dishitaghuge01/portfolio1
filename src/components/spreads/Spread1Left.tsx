@@ -4,8 +4,6 @@ import { socialLinks } from '../../data/profile';
 import resumePdf from '../../assets/resume.pdf';
 import dishitaPhoto from '../../assets/Dishita.jpeg'
 import styles from './Spread1Left.module.css';
-import ExternalLinkArrow from '../../components/ui/ExternalLinkArrow';
-
 
 // ── Geometry constants ────────────────────────────────────────────────────────
 const CX       = 260;                      // wrapper/SVG center x
@@ -211,6 +209,11 @@ const Spread1Left: React.FC = () => {
     <div className={styles.page}>
 
       {/* ① Radar orbital circle */}
+      {/* orbitalScaleBox reserves the (responsive) layout space; orbitalWrapper
+          keeps its original 520×520 geometry untouched and is scaled down as
+          one visual unit on mobile, so none of the trig-based positioning
+          inside it needs to change. */}
+      <div className={styles.orbitalScaleBox}>
       <div className={styles.orbitalWrapper}>
 
         {/* Photo frame — absolutely centered */}
@@ -306,6 +309,7 @@ const Spread1Left: React.FC = () => {
           );
         })}
       </div>
+      </div>
 
       {/* ② Name + tagline */}
       <div className={styles.identity}>
@@ -327,7 +331,7 @@ const Spread1Left: React.FC = () => {
             aria-label={link.platform}
           >
             <span className={styles.socialLabel}>{link.platform}</span>
-            <span className={styles.socialArrow}><ExternalLinkArrow /></span>
+            <span className={styles.socialArrow}>↗</span>
           </a>
         ))}
 

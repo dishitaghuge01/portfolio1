@@ -10,11 +10,36 @@
 }
 
 /* ── Radar orbital wrapper ───────────────────────────────────────────────────── */
-.orbitalWrapper {
+/* orbitalScaleBox reserves the actual layout space (520×520 on desktop,
+   shrunk via media query on mobile). orbitalWrapper keeps its native
+   520×520 box — all the JS-computed positions inside it assume this exact
+   size — and is scaled down as a whole unit via transform, so nothing
+   inside it needs to be recalculated. */
+.orbitalScaleBox {
   position: relative;
   width: 520px;
   height: 520px;
   flex-shrink: 0;
+}
+
+.orbitalWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 520px;
+  height: 520px;
+}
+
+@media (max-width: 767px) {
+  .orbitalScaleBox {
+    width: 320px;
+    height: 320px;
+  }
+
+  .orbitalWrapper {
+    transform: scale(0.615); /* 320 / 520 */
+    transform-origin: top left;
+  }
 }
 
 .circleAnchor {

@@ -2,6 +2,7 @@
 .mobileScene {
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* accounts for mobile browser chrome resizing; vh is the fallback */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,6 +19,7 @@
   position: relative;
   width: 100%;
   height: 88vh;
+  height: 88dvh; /* same dynamic-viewport fix as above */
   background: var(--bg-surface);
   border-radius: 12px;
   overflow: hidden;
@@ -40,19 +42,27 @@
 }
 
 /* Overrides BookPage's default 50% width / asymmetric border-radius so a
-   single page fills the whole mobile viewport cleanly. */
+   single page fills the whole mobile viewport cleanly. Also switches the
+   inherited overflow:hidden to overflow-y:auto — some pages (like the ToC,
+   with 7 cards) are taller than one screen, and should scroll internally
+   rather than clip their top/bottom content. */
 .fullWidthPage {
   width: 100% !important;
   border-radius: 12px !important;
   border-right: none !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* ── Click zones — thin edge strips, content never blocked ────────────────── */
+/* 44px matches the minimum recommended touch-target size (was 40px, fine for
+   desktop mouse clicks but a bit tight for fingers). */
 .clickZone {
   position: absolute;
   top: 0;
   height: 100%;
-  width: 40px;
+  width: 44px;
   z-index: 30;
   background: transparent;
 }
