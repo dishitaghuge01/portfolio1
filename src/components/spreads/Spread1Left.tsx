@@ -5,6 +5,7 @@ import resumePdf from '../../assets/resume.pdf';
 import dishitaPhoto from '../../assets/Dishita.jpeg'
 import styles from './Spread1Left.module.css';
 import ExternalLinkArrow from '../../components/ui/ExternalLinkArrow';
+import SocialIcon from '../../components/ui/SocialIcon';
 
 
 // ── Geometry constants ────────────────────────────────────────────────────────
@@ -329,11 +330,10 @@ const Spread1Left: React.FC = () => {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={styles.socialLink}
+            className={styles.socialIconLink}
             aria-label={link.platform}
           >
-            <span className={styles.socialLabel}>{link.platform}</span>
-            <span className={styles.socialArrow}><ExternalLinkArrow /></span>
+            <SocialIcon platform={link.platform} />
           </a>
         ))}
 
