@@ -2,6 +2,7 @@ import React from 'react';
 import GlassCircle from '../../components/ui/GlassCircle';
 import { projects } from '../../data/projects';
 import styles from './Spread3Left.module.css';
+import ExternalLinkArrow from '../../components/ui/ExternalLinkArrow';
 
 // ── Floorplan placeholder SVG ─────────────────────────────────────────────────
 // Abstract room layout: outer boundary + 3 interior walls dividing 4 rooms.
@@ -62,7 +63,7 @@ const Spread3Left: React.FC = () => (
       rel="noopener noreferrer"
       className={styles.liveLink}
     >
-      ↗ Live Demo
+      <ExternalLinkArrow /> Live Demo
     </a>
   </div>
 );

@@ -76,6 +76,9 @@
 .cornerPill {
   position: absolute;
   z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: rgba(0, 0, 0, 0.30);
   border: 1px solid rgba(255, 255, 255, 0.20);
   border-radius: 999px;

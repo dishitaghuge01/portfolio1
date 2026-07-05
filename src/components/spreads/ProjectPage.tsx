@@ -1,5 +1,6 @@
 import React from 'react';
 import TechChip from '../../components/ui/TechChip';
+import ExternalLinkArrow from '../../components/ui/ExternalLinkArrow';
 import { projects } from '../../data/projects';
 import { spreadsMeta } from '../../data/spreads';
 import styles from './ProjectPage.module.css';
@@ -33,7 +34,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectIndex }) => {
           className={`${styles.cornerPill} ${styles.pillTopLeft}`}
           aria-label={`${project.title} GitHub repository`}
         >
-          GitHub ↗
+          GitHub <ExternalLinkArrow />
         </a>
 
         {/* Live demo pill — top right */}
@@ -44,7 +45,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ projectIndex }) => {
           className={`${styles.cornerPill} ${styles.pillTopRight}`}
           aria-label={`${project.title} live demo`}
         >
-          LIVE DEMO ↗
+          LIVE DEMO <ExternalLinkArrow />
         </a>
 
         {/* Centered icon + watermark */}

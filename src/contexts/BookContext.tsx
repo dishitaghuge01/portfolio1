@@ -17,7 +17,7 @@ interface BookContextValue {
   currentSpread: number;
   targetSpread: number;
   totalSpreads: number;
-  goToSpread: (n: number) => void;
+  goToSpread: (n: number, side?: PageSide) => void;
   nextSpread: () => void;
   prevSpread: () => void;
 
@@ -70,18 +70,18 @@ export const BookProvider: React.FC<BookProviderProps> = ({
   const flipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const goToSpread = useCallback(
-    (n: number) => {
+    (n: number, side: PageSide = 'left') => {
       // Guard: already animating, same page, or out of range
       if (isFlipping) return;
       if (n === currentSpread) return;
       if (n < 1 || n > totalSpreads) return;
 
       const direction: FlipDirection = n > currentSpread ? 'forward' : 'backward';
-      const correspondingLeftPage = (n - 1) * 2 + 1;
+      const correspondingPage = side === 'left' ? (n - 1) * 2 + 1 : (n - 1) * 2 + 2;
 
       setFlipDirection(direction);
       setTargetSpread(n);
-      setTargetPage(correspondingLeftPage);
+      setTargetPage(correspondingPage);
       setIsFlipping(true);
 
       // Clear any stale timer (safety net)
@@ -91,7 +91,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({
 
       flipTimerRef.current = setTimeout(() => {
         setCurrentSpread(n);
-        setCurrentPage(correspondingLeftPage);
+        setCurrentPage(correspondingPage);
         setIsFlipping(false);
         flipTimerRef.current = null;
       }, FLIP_DURATION_MS);

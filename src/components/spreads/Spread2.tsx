@@ -4,13 +4,13 @@ import { useBook } from '../../contexts/BookContext';
 import styles from './Spread2.module.css';
 
 const TOC_ENTRIES = [
-  { title: 'Education & Experience', subtitle: 'Institution and Internships', spreadIndex: 2 },
-  { title: 'Railway PQ-Auth', subtitle: 'Post-Quantum Authentication for Indian Railways', spreadIndex: 3 },
-  { title: 'ArchIntel', subtitle: 'Graph AI that scores residential floorplans for design quality', spreadIndex: 3 },
-  { title: 'Nexus Storage', subtitle: 'Multi-tenant cloud storage with real-time usage billing', spreadIndex: 4 },
-  { title: 'High Court NER', subtitle: 'Named entity extraction from Indian judicial documents', spreadIndex: 4 },
-  { title: 'Research & Skills', subtitle: 'Research, credentials, and technical depth', spreadIndex: 5 },
-  { title: 'Achievements', subtitle: 'Recognition, competitions, and reach', spreadIndex: 5 },
+  { title: 'Education & Experience', subtitle: 'Institution and Internships', spreadIndex: 2, side: 'right' as const },
+  { title: 'Railway PQ-Auth', subtitle: 'Post-Quantum Authentication for Indian Railways', spreadIndex: 3, side: 'left' as const },
+  { title: 'ArchIntel', subtitle: 'Graph AI that scores residential floorplans for design quality', spreadIndex: 3, side: 'right' as const },
+  { title: 'Nexus Storage', subtitle: 'Multi-tenant cloud storage with real-time usage billing', spreadIndex: 4, side: 'left' as const },
+  { title: 'High Court NER', subtitle: 'Named entity extraction from Indian judicial documents', spreadIndex: 4, side: 'right' as const },
+  { title: 'Research & Skills', subtitle: 'Research, credentials, and technical depth', spreadIndex: 5, side: 'left' as const },
+  { title: 'Achievements', subtitle: 'Recognition, competitions, and reach', spreadIndex: 5, side: 'right' as const },
 ];
 
 // ── Reusable row ──────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ const Spread2ToC: React.FC = () => {
             rowKey={entry.title}
             title={entry.title}
             subtitle={entry.subtitle}
-            onActivate={() => goToSpread(entry.spreadIndex)}
+            onActivate={() => goToSpread(entry.spreadIndex, entry.side)}
           />
         ))}
       </div>
