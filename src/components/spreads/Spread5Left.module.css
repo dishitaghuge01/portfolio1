@@ -198,3 +198,51 @@
     font-size: 8px;
   }
 }
+
+/* ── Short-window compaction (desktop) ────────────────────────────────────── */
+@media (min-width: 768px) and (max-height: 800px) {
+  .page {
+    gap: 14px;
+  }
+
+  .papersList {
+    gap: 11px;
+  }
+
+  .paperCard {
+    padding: 11px 13px;
+  }
+
+  .statusWord {
+    font-size: 12px;
+  }
+
+  .paperTitle {
+    font-size: 14.5px;
+    margin: 6px 0;
+  }
+
+  .bodyText, .tagsLine, .timelineMeta {
+    font-size: 12.5px;
+    margin: 0 0 7px 0;
+  }
+
+  .skillGroups {
+    grid-template-columns: 95px 1fr;
+    gap: 4px 6px;
+  }
+
+  .skillGroupLabel {
+    width: 95px;
+    font-size: 10px;
+  }
+
+  .skillGroupItems {
+    gap: 5px;
+  }
+
+  .chip {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+}

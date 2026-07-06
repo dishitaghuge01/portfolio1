@@ -214,3 +214,42 @@
     margin: 0 0 3px 0;
   }
 }
+
+/* ── Short-window compaction (desktop) ────────────────────────────────────── */
+@media (min-width: 768px) and (max-height: 800px) {
+  .page {
+    gap: 16px;
+  }
+
+  .eduCard, .expCard {
+    padding: 13px;
+  }
+
+  .cgpaNumber {
+    font-size: 22px;
+  }
+
+  .vDivider {
+    height: 38px;
+  }
+
+  .eduInstitution, .expCompany {
+    font-size: 14.5px;
+  }
+
+  .eduDegree, .eduMinor, .eduMeta, .expRole, .expMeta, .bulletText {
+    font-size: 12.5px;
+  }
+
+  .expList {
+    gap: 9px;
+  }
+
+  .bulletList {
+    gap: 5px;
+  }
+
+  .expMeta {
+    margin: 0 0 6px 0;
+  }
+}

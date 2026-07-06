@@ -188,3 +188,41 @@
     line-height: 1.25;
   }
 }
+
+/* ── Short-window compaction (desktop) ────────────────────────────────────── */
+@media (min-width: 768px) and (max-height: 800px) {
+  .topBlock {
+    gap: 14px;
+  }
+
+  .heading {
+    font-size: 46px;
+  }
+
+  .description {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .list {
+    gap: 7px;
+  }
+
+  .tocHeader {
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .tocTitle {
+    font-size: 22px;
+  }
+
+  .achievementTitle {
+    font-size: 14px;
+  }
+
+  .achievementSubtitle {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+}

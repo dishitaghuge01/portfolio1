@@ -6,7 +6,9 @@
   background: var(--page-bg);
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   box-sizing: border-box;
 }
 

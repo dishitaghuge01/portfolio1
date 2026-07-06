@@ -24,6 +24,12 @@
   .padding-md { padding: 10px 12px; }
   .padding-lg { padding: 14px 16px; }
 }
+
+@media (min-width: 768px) and (max-height: 800px) {
+  .padding-sm { padding: 8px 12px; }
+  .padding-md { padding: 14px 16px; }
+  .padding-lg { padding: 20px 22px; }
+}
 /* Hoverable */
 .hoverable {
   cursor: pointer;

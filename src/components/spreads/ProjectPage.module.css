@@ -116,7 +116,8 @@
   gap: 8px;
   background: var(--page-bg);
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Row 1 — number badge + title */
@@ -265,5 +266,39 @@
 
   .chipRow {
     gap: 2px;
+  }
+}
+
+/* ── Short-window compaction (desktop) ────────────────────────────────────── */
+/* Independent of the width-based mobile query above — this targets any
+   desktop browser window that's shorter than expected (smaller monitor,
+   un-maximized window, extra browser chrome), where the book's 82vh height
+   ends up giving less room than the fixed-px content assumes. */
+@media (min-width: 768px) and (max-height: 800px) {
+  .mediaZone {
+    flex: 0 0 40%;
+  }
+
+  .detailZone {
+    padding: 12px;
+    gap: 5px;
+  }
+
+  .projectTitle {
+    font-size: 20px;
+  }
+
+  .description {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .bulletList {
+    gap: 3px;
+  }
+
+  .bulletText {
+    font-size: 12.5px;
+    line-height: 1.35;
   }
 }
