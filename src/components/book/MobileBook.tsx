@@ -28,7 +28,6 @@ const MobileBook: React.FC = () => {
     currentPage,
     targetPage,
     totalPages,
-    currentPageSide,
     nextPage,
     prevPage,
     isFlipping,
@@ -153,12 +152,13 @@ const MobileBook: React.FC = () => {
   return (
     <div className={styles.mobileScene}>
       <div ref={pageRef} className={styles.mobilePage}>
-        {/* NOTE: `side` is intentionally currentPageSide (fixed for the whole
-            600ms flip, since context only updates it once the flip completes) —
-            NOT the midpoint-swapped displayedSide. BookPage's isIncoming/
-            isOutgoing logic depends on side staying constant through a flip. */}
+        {/* `side` is hardcoded to 'right' — not the alternating currentPageSide —
+            so every page flip pivots at the left edge, as if the book's spine
+            always sits on the left. This is a deliberate mobile-only illusion:
+            there's no real spine on a single full-width page, so we pick one
+            consistent hinge instead of alternating per odd/even page. */}
         <BookPage
-          side={currentPageSide}
+          side="right"
           isFlipping={isFlipping}
           flipDirection={flipDirection}
           className={styles.fullWidthPage}
