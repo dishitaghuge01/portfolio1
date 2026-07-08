@@ -2,6 +2,7 @@ import React from 'react';
 import { papers } from '../../data/publications';
 import type { ResearchPaper } from '../../data/publications';
 import styles from './Spread5Left.module.css';
+import ScaleToFit from '../../components/ui/ScaleToFit';
 
 const skillGroups = [
   { label: 'AI/ML & NLP', items: ['spaCy', 'LangChain', 'Whisper', 'OCR', 'RAG', 'Anaconda'] },
@@ -62,6 +63,7 @@ const PaperCard: React.FC<{ paper: ResearchPaper }> = ({ paper }) => {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 const Spread5Left: React.FC = () => (
+  <ScaleToFit>
   <div className={styles.page}>
 
     {/* Header */}
@@ -95,6 +97,7 @@ const Spread5Left: React.FC = () => (
     </div>
 
   </div>
+  </ScaleToFit>
 );
 
 export default Spread5Left;

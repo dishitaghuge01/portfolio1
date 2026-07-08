@@ -2,6 +2,7 @@ import React from 'react';
 import GlassCard from '../../components/ui/GlassCard';
 import { achievements } from '../../data/profile';
 import styles from './AchievementsPage.module.css';
+import ScaleToFit from '../../components/ui/ScaleToFit';
 
 interface AchievementItem {
   title: string;
@@ -9,6 +10,7 @@ interface AchievementItem {
 }
 
 const AchievementsPage: React.FC = () => (
+  <ScaleToFit>
   <div className={styles.page}>
 
     {/* Header */}
@@ -69,6 +71,7 @@ const AchievementsPage: React.FC = () => (
     </div>
 
   </div>
+  </ScaleToFit>
 );
 
 export default AchievementsPage;

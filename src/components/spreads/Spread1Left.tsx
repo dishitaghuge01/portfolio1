@@ -6,7 +6,7 @@ import dishitaPhoto from '../../assets/Dishita.jpeg'
 import styles from './Spread1Left.module.css';
 import ExternalLinkArrow from '../../components/ui/ExternalLinkArrow';
 import SocialIcon from '../../components/ui/SocialIcon';
-
+import ScaleToFit from '../../components/ui/ScaleToFit';
 
 // ── Geometry constants ────────────────────────────────────────────────────────
 const CX       = 260;                      // wrapper/SVG center x
@@ -209,6 +209,7 @@ const Spread1Left: React.FC = () => {
   }, []);
 
   return (
+    <ScaleToFit>
     <div className={styles.page}>
 
       {/* ① Radar orbital circle */}
@@ -353,6 +354,7 @@ const Spread1Left: React.FC = () => {
       </div>
 
     </div>
+    </ScaleToFit>
   );
 };
 
