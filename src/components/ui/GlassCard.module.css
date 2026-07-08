@@ -26,9 +26,9 @@
 }
 
 @media (min-width: 768px) and (max-height: 800px) {
-  .padding-sm { padding: 8px 12px; }
-  .padding-md { padding: 14px 16px; }
-  .padding-lg { padding: 20px 22px; }
+  .padding-sm { padding: 6px 9px; }
+  .padding-md { padding: 10px 12px; }
+  .padding-lg { padding: 15px 17px; }
 }
 /* Hoverable */
 .hoverable {

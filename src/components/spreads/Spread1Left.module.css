@@ -233,3 +233,57 @@
     margin-left: 3px;
   }
 }
+
+/* ── Short-window compaction (desktop) ────────────────────────────────────── */
+/* The 520px orbital circle alone can consume most of a short browser
+   window's available height, pushing name/tagline/social row off the
+   bottom. Shrink it (same scale trick as the mobile version) plus the
+   identity block below it. */
+@media (min-width: 768px) and (max-height: 800px) {
+  .page {
+    gap: 4px;
+  }
+
+  .orbitalScaleBox {
+    width: 380px;
+    height: 380px;
+  }
+
+  .orbitalWrapper {
+    transform: scale(0.731); /* 380 / 520 */
+    transform-origin: top left;
+  }
+
+  .identity {
+    margin-top: -10px;
+  }
+
+  .name {
+    font-size: 38px;
+    margin: 0 0 4px 0;
+  }
+
+  .tagline {
+    font-size: 14px;
+    max-width: 280px;
+    line-height: 1.4;
+  }
+
+  .socialRow {
+    gap: 12px;
+  }
+
+  .socialLink {
+    padding: 6px 14px;
+    gap: 5px;
+  }
+
+  .socialLabel {
+    font-size: 14px;
+  }
+
+  .socialArrow {
+    font-size: 10px;
+    margin-left: 4px;
+  }
+}
